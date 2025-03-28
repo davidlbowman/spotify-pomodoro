@@ -8,11 +8,11 @@
 	"files": {
 		"ignoreUnknown": false,
 		"ignore": [
-			"tsconfig.node.json",
-			"tsconfig.app.json",
-			"dist",
-			"node_modules",
-			"src/components/ui"
+			"packages/client/tsconfig.node.json",
+			"packages/client/tsconfig.app.json",
+			"packages/client/dist",
+			"packages/client/node_modules",
+			"packages/client/src/components/ui"
 		]
 	},
 	"formatter": {

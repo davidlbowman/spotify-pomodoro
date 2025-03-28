@@ -1,4 +1,4 @@
-# spotify-pomodoro
+# server
 
 To install dependencies:
 
