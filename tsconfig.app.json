@@ -30,5 +30,5 @@
       ]
     }
   },
-  "include": ["src"]
+  "include": ["src", "src/lib/spotify/.OLDauth.ts"]
 }
