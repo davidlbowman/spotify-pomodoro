@@ -24,9 +24,13 @@ import { useEffect, useState } from "react";
 
 interface SpotifyLoginProps {
 	onPlaylistSelect: (playlistId: string) => void;
+	onTokenUpdate: (token: SpotifyTokenInfo | null) => void;
 }
 
-export default function SpotifyLogin({ onPlaylistSelect }: SpotifyLoginProps) {
+export default function SpotifyLogin({
+	onPlaylistSelect,
+	onTokenUpdate,
+}: SpotifyLoginProps) {
 	const [token, setToken] = useState<SpotifyTokenInfo | null>(null);
 	const [playlists, setPlaylists] = useState<
 		Array<{
@@ -44,9 +48,10 @@ export default function SpotifyLogin({ onPlaylistSelect }: SpotifyLoginProps) {
 		const tokenFromUrl = getTokenFromUrl();
 		if (tokenFromUrl && isTokenValid(tokenFromUrl)) {
 			setToken(tokenFromUrl);
+			onTokenUpdate(tokenFromUrl);
 			setShowPlaylistDialog(true);
 		}
-	}, []);
+	}, [onTokenUpdate]);
 
 	useEffect(() => {
 		async function fetchPlaylists() {
