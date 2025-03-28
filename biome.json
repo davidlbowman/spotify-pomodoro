@@ -11,7 +11,8 @@
 			"tsconfig.node.json",
 			"tsconfig.app.json",
 			"dist",
-			"node_modules"
+			"node_modules",
+			"src/components/ui"
 		]
 	},
 	"formatter": {

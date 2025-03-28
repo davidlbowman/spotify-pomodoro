@@ -9,9 +9,10 @@
 		"preview": "vite preview",
 		"format": "bunx biome format --write .",
 		"lint": "bunx biome format --write .",
-		"check": "bunx biome check ."
+		"check": "bunx biome check --fix --unsafe ."
 	},
 	"dependencies": {
+		"@radix-ui/react-slot": "^1.1.2",
 		"@tailwindcss/vite": "^4.0.17",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
