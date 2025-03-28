@@ -8,8 +8,15 @@ function App() {
 	const [time, setTime] = useState(20 * 60);
 	const [isActive, setIsActive] = useState(false);
 	const [task, setTask] = useState("");
+	const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(
+		localStorage.getItem("spotify_playlist_id"),
+	);
 
-	const toggleTimer = () => setIsActive(!isActive);
+	const toggleTimer = () => {
+		setIsActive(!isActive);
+		// TODO: Implement Spotify playback control when playlist is selected
+	};
+
 	const resetTimer = () => {
 		setTime(20 * 60);
 		setIsActive(false);
@@ -24,7 +31,7 @@ function App() {
 			}, 1000);
 		} else if (time === 0) {
 			setIsActive(false);
-			// Here you would trigger Spotify to play/pause
+			// TODO: Implement Spotify pause when timer ends
 		}
 
 		return () => {
@@ -40,7 +47,7 @@ function App() {
 				className="absolute inset-0 w-full h-full object-cover"
 			/>
 			<div className="absolute top-4 right-4">
-				<SpotifyLogin />
+				<SpotifyLogin onPlaylistSelect={(id) => setSelectedPlaylistId(id)} />
 			</div>
 			<div className="z-10 text-white text-center">
 				<PomodoroTimer time={time} />

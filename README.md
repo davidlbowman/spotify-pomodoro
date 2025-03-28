@@ -23,11 +23,6 @@ This application provides a simple Pomodoro timer that plays music from a Spotif
 
 ## Implementation Plan
 
-### 1. Project Setup
-
-- Initialize a new Vite project with React
-- Install and configure Shadcn UI
-- Set up basic project structure
 
 ### 2. Spotify Integration
 
