@@ -39,7 +39,7 @@ packages/server/.DS_Store
 packages/server/.env
 
 # Monorepo
-/node_modules
+node_modules
 *.env
 *.env.development.local
 *.env.test.local
