@@ -13,12 +13,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import {
+	type SpotifyTokenInfo,
 	generateSpotifyAuthUrl,
 	getTokenFromUrl,
 	getUserPlaylists,
 	isTokenValid,
-} from "@/lib/spotify/auth";
-import type { SpotifyTokenInfo } from "@/lib/spotify/types";
+} from "@/lib/spotify";
 import { Loader2, LogIn, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 

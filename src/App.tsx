@@ -1,8 +1,11 @@
 import PomodoroTimer from "@/components/pomodoro-timer";
 import SpotifyLogin from "@/components/spotify-login";
 import { Button } from "@/components/ui/button";
-import { pausePlayback, startPlayback } from "@/lib/spotify/auth";
-import type { SpotifyTokenInfo } from "@/lib/spotify/types";
+import {
+	type SpotifyTokenInfo,
+	pausePlayback,
+	startPlayback,
+} from "@/lib/spotify";
 import { Pause, Play, RefreshCw, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 
