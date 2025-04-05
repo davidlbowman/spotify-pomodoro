@@ -12,86 +12,25 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	generateSpotifyAuthUrl,
-	getTokenFromUrl,
-	getUserPlaylists,
-	isTokenValid,
-} from "@/lib/spotify/auth";
-import type { SpotifyTokenInfo } from "@/lib/spotify/types";
-import { Loader2, LogIn, Music2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Loader2, Music2 } from "lucide-react";
+import { useState } from "react";
 
-interface SpotifyLoginProps {
-	onPlaylistSelect: (playlistId: string) => void;
-	onTokenUpdate: (token: SpotifyTokenInfo | null) => void;
-}
+const playlists = [
+	{
+		id: "1",
+		name: "Playlist 1",
+		owner: { display_name: "John Doe" },
+	},
+];
 
-export default function SpotifyLogin({
-	onPlaylistSelect,
-	onTokenUpdate,
-}: SpotifyLoginProps) {
-	const [token, setToken] = useState<SpotifyTokenInfo | null>(null);
-	const [playlists, setPlaylists] = useState<
-		Array<{
-			id: string;
-			name: string;
-			images: Array<{ url: string }>;
-			owner: { display_name: string };
-		}>
-	>([]);
-	const [selectedPlaylist, setSelectedPlaylist] = useState<string>("");
-	const [loading, setLoading] = useState(false);
+export default function SpotifyLogin() {
 	const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
 
-	useEffect(() => {
-		const tokenFromUrl = getTokenFromUrl();
-		if (tokenFromUrl && isTokenValid(tokenFromUrl)) {
-			setToken(tokenFromUrl);
-			onTokenUpdate(tokenFromUrl);
-			setShowPlaylistDialog(true);
-		}
-	}, [onTokenUpdate]);
-
-	useEffect(() => {
-		async function fetchPlaylists() {
-			if (token?.accessToken) {
-				setLoading(true);
-				try {
-					const response = await getUserPlaylists(token.accessToken);
-					setPlaylists(response.items);
-				} catch (error) {
-					console.error("Failed to fetch playlists:", error);
-				} finally {
-					setLoading(false);
-				}
-			}
-		}
-
-		if (showPlaylistDialog) {
-			void fetchPlaylists();
-		}
-	}, [token?.accessToken, showPlaylistDialog]);
-
-	const handleLogin = () => {
-		window.location.href = generateSpotifyAuthUrl();
+	const handlePlaylistSelect = (playlistId: string) => {
+		setSelectedPlaylist(playlistId);
 	};
-
-	const handlePlaylistSelect = (value: string) => {
-		setSelectedPlaylist(value);
-		setShowPlaylistDialog(false);
-		localStorage.setItem("spotify_playlist_id", value);
-		onPlaylistSelect(value);
-	};
-
-	if (!token || !isTokenValid(token)) {
-		return (
-			<Button onClick={handleLogin} variant="outline" size="sm">
-				<LogIn className="w-4 h-4 mr-2" />
-				Connect Spotify
-			</Button>
-		);
-	}
 
 	return (
 		<>
@@ -115,7 +54,7 @@ export default function SpotifyLogin({
 						</div>
 					) : (
 						<Select
-							value={selectedPlaylist}
+							value={selectedPlaylist ?? undefined}
 							onValueChange={handlePlaylistSelect}
 						>
 							<SelectTrigger>

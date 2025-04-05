@@ -1,72 +1,12 @@
 import PomodoroTimer from "@/components/pomodoro-timer";
 import SpotifyLogin from "@/components/spotify-login";
 import { Button } from "@/components/ui/button";
-import { pausePlayback, startPlayback } from "@/lib/spotify/auth";
-import type { SpotifyTokenInfo } from "@/lib/spotify/types";
 import { Pause, Play, RefreshCw, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function App() {
-	const [time, setTime] = useState(20 * 60);
 	const [isActive, setIsActive] = useState(false);
 	const [task, setTask] = useState("");
-	const [spotifyToken, setSpotifyToken] = useState<SpotifyTokenInfo | null>(
-		null,
-	);
-	const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(
-		localStorage.getItem("spotify_playlist_id"),
-	);
-
-	const toggleTimer = async () => {
-		if (!spotifyToken?.accessToken || !selectedPlaylistId) {
-			setIsActive(!isActive);
-			return;
-		}
-
-		try {
-			if (isActive) {
-				await pausePlayback(spotifyToken.accessToken);
-			} else {
-				await startPlayback(spotifyToken.accessToken, selectedPlaylistId);
-			}
-			setIsActive(!isActive);
-		} catch (error) {
-			console.error("Failed to control Spotify playback:", error);
-		}
-	};
-
-	const resetTimer = async () => {
-		if (spotifyToken?.accessToken && isActive) {
-			try {
-				await pausePlayback(spotifyToken.accessToken);
-			} catch (error) {
-				console.error("Failed to pause Spotify playback:", error);
-			}
-		}
-		setTime(20 * 60);
-		setIsActive(false);
-	};
-
-	useEffect(() => {
-		let interval: ReturnType<typeof setInterval> | null = null;
-
-		if (isActive && time > 0) {
-			interval = setInterval(() => {
-				setTime((prevTime) => prevTime - 1);
-			}, 1000);
-		} else if (time === 0) {
-			setIsActive(false);
-			if (spotifyToken?.accessToken) {
-				void pausePlayback(spotifyToken.accessToken).catch((error) => {
-					console.error("Failed to pause Spotify playback:", error);
-				});
-			}
-		}
-
-		return () => {
-			if (interval) clearInterval(interval);
-		};
-	}, [isActive, time, spotifyToken?.accessToken]);
 
 	return (
 		<main className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
@@ -76,20 +16,12 @@ function App() {
 				className="absolute inset-0 w-full h-full object-cover"
 			/>
 			<div className="absolute top-4 right-4">
-				<SpotifyLogin
-					onPlaylistSelect={(id) => setSelectedPlaylistId(id)}
-					onTokenUpdate={(token) => setSpotifyToken(token)}
-				/>
+				<SpotifyLogin />
 			</div>
 			<div className="z-10 text-white text-center">
-				<PomodoroTimer time={time} />
+				<PomodoroTimer time={20} />
 				<div className="mt-8 space-x-4">
-					<Button
-						variant="outline"
-						size="icon"
-						onClick={toggleTimer}
-						aria-label={isActive ? "Pause timer" : "Start timer"}
-					>
+					<Button variant="outline" size="icon" onClick={() => {}}>
 						{isActive ? (
 							<Pause className="h-6 w-6 text-gray-600" />
 						) : (
@@ -99,7 +31,7 @@ function App() {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={resetTimer}
+						onClick={() => {}}
 						aria-label="Reset timer"
 					>
 						<RefreshCw className="h-6 w-6 text-gray-600" />
