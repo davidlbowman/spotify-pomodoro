@@ -40,7 +40,7 @@ export default function SpotifyLogin() {
 				size="sm"
 			>
 				<Music2 className="w-4 h-4 mr-2" />
-				Select Playlist
+				Login with Spotify
 			</Button>
 
 			<Dialog open={showPlaylistDialog} onOpenChange={setShowPlaylistDialog}>
