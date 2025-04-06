@@ -1,4 +1,5 @@
 import { Effect, Schema } from "effect";
+import { ParseError, SpotifyError } from "../../types/errors";
 
 const GetAccessTokenParamsSchema = Schema.Struct({
 	clientId: Schema.String,
@@ -17,7 +18,8 @@ export const getAccessToken = (params: GetAccessTokenParams) =>
 	Effect.gen(function* () {
 		const { clientId, clientSecret } = yield* Effect.try({
 			try: () => Schema.decodeUnknownSync(GetAccessTokenParamsSchema)(params),
-			catch: () => new Error("Failed to validate params"),
+			catch: (error) =>
+				new ParseError({ reason: `Failed to validate params: ${error}` }),
 		});
 
 		const response = yield* Effect.tryPromise({
@@ -35,19 +37,29 @@ export const getAccessToken = (params: GetAccessTokenParams) =>
 					body: bodyParams,
 				});
 			},
-			catch: () => new Error("Failed to fetch access token"),
+			catch: (error) =>
+				new SpotifyError({ reason: `Failed to fetch access token: ${error}` }),
 		});
 
 		const jsonData = yield* Effect.tryPromise({
 			try: () => response.json(),
-			catch: () => new Error("Failed to parse response"),
+			catch: (error) =>
+				new SpotifyError({ reason: `Failed to parse response: ${error}` }),
 		});
 
 		const parsedData = yield* Effect.try({
 			try: () =>
 				Schema.decodeUnknownSync(GetAccessTokenResponseSchema)(jsonData),
-			catch: (error) => new Error(`Failed to validate response: ${error}`),
+			catch: (error) =>
+				new ParseError({ reason: `Failed to validate response: ${error}` }),
 		});
 
 		return parsedData;
 	});
+
+Effect.runPromise(
+	getAccessToken({
+		clientId: "b9a43f1ecd77436cbcd64bbcc00190a4",
+		clientSecret: "5aec01fccc5f47afbc69dd6ce35ad033",
+	}),
+).then(console.log);
