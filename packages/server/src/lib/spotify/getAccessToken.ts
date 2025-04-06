@@ -56,10 +56,3 @@ export const getAccessToken = (params: GetAccessTokenParams) =>
 
 		return parsedData;
 	});
-
-Effect.runPromise(
-	getAccessToken({
-		clientId: "b9a43f1ecd77436cbcd64bbcc00190a4",
-		clientSecret: "5aec01fccc5f47afbc69dd6ce35ad033",
-	}),
-).then(console.log);
