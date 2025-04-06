@@ -4,7 +4,7 @@ import {
 	GetAccessTokenParamsSchema,
 	getAccessToken,
 } from "../lib/spotify/getAccessToken";
-import { EnvironmentError, SpotifyError } from "../types/errors";
+import { EnvironmentError } from "../types/errors";
 
 describe("Spotify Tests", () => {
 	test("should get access token", async () => {

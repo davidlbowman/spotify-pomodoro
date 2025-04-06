@@ -1,26 +1,24 @@
 import { Effect, Schema } from "effect";
-import { ParseError, SpotifyError } from "../../types/errors";
+import { SpotifyError } from "../../types/errors";
 
 export const GetAccessTokenParamsSchema = Schema.Struct({
-	clientId: Schema.String,
-	clientSecret: Schema.String,
+	clientId: Schema.NonEmptyString,
+	clientSecret: Schema.NonEmptyString,
 });
 
 type GetAccessTokenParams = typeof GetAccessTokenParamsSchema.Type;
 
 const GetAccessTokenResponseSchema = Schema.Struct({
-	access_token: Schema.String,
-	token_type: Schema.String,
+	access_token: Schema.NonEmptyString,
+	token_type: Schema.NonEmptyString,
 	expires_in: Schema.Number,
 });
 
 export const getAccessToken = (params: GetAccessTokenParams) =>
 	Effect.gen(function* () {
-		const { clientId, clientSecret } = yield* Effect.try({
-			try: () => Schema.decodeUnknownSync(GetAccessTokenParamsSchema)(params),
-			catch: (error) =>
-				new ParseError({ reason: `Failed to validate params: ${error}` }),
-		});
+		const { clientId, clientSecret } = yield* Schema.decodeUnknown(
+			GetAccessTokenParamsSchema,
+		)(params);
 
 		const response = yield* Effect.tryPromise({
 			try: () => {
@@ -47,12 +45,9 @@ export const getAccessToken = (params: GetAccessTokenParams) =>
 				new SpotifyError({ reason: `Failed to parse response: ${error}` }),
 		});
 
-		const parsedData = yield* Effect.try({
-			try: () =>
-				Schema.decodeUnknownSync(GetAccessTokenResponseSchema)(jsonData),
-			catch: (error) =>
-				new ParseError({ reason: `Failed to validate response: ${error}` }),
-		});
+		const parsedData = yield* Schema.decodeUnknown(
+			GetAccessTokenResponseSchema,
+		)(jsonData);
 
 		return parsedData;
 	});
