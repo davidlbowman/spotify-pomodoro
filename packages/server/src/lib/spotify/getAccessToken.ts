@@ -1,7 +1,7 @@
 import { Effect, Schema } from "effect";
 import { ParseError, SpotifyError } from "../../types/errors";
 
-const GetAccessTokenParamsSchema = Schema.Struct({
+export const GetAccessTokenParamsSchema = Schema.Struct({
 	clientId: Schema.String,
 	clientSecret: Schema.String,
 });

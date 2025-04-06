@@ -6,7 +6,7 @@
 		"dev": "bun run --cwd packages/server dev & bun run --cwd packages/client dev",
 		"build": "bun run --cwd packages/client build",
 		"start": "bun run --cwd packages/client preview",
-		"test": "bun test",
+		"test": "bun test --cwd packages/server",
 		"format": "bunx biome format --write .",
 		"lint": "bunx biome check --fix ."
 	},
