@@ -12,8 +12,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { getAuthorizationURL } from "@/lib/spotify/getAuthorizationUrl";
+import { Effect } from "effect";
 import { Loader2, Music2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const playlists = [
 	{
@@ -23,10 +25,38 @@ const playlists = [
 	},
 ];
 
+type AuthState = "unauthenticated" | "authenticating" | "authenticated";
+
 export default function SpotifyLogin() {
 	const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [authState, setAuthState] = useState<AuthState>("unauthenticated");
+	const [accessToken, setAccessToken] = useState<string | null>(null);
 	const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
+
+	useEffect(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		const code = urlParams.get("code");
+		if (code) {
+			setAuthState("authenticating");
+			fetch("http://localhost:3000/api/spotify/requestAccessToken", {
+				method: "POST",
+				body: JSON.stringify({ code }),
+			})
+				.then((res) => res.json())
+				.then((token) => {
+					setAccessToken(token.access_token);
+					setAuthState("authenticated");
+					window.history.replaceState({}, "", window.location.pathname);
+				})
+				.catch(() => setAuthState("unauthenticated"));
+		}
+	}, []);
+
+	const handleAuthorization = () => {
+		const authorizationUrl = Effect.runSync(getAuthorizationURL());
+		window.location.href = authorizationUrl;
+	};
 
 	const handlePlaylistSelect = (playlistId: string) => {
 		setSelectedPlaylist(playlistId);
@@ -34,13 +64,11 @@ export default function SpotifyLogin() {
 
 	return (
 		<>
-			<Button
-				onClick={() => setShowPlaylistDialog(true)}
-				variant="outline"
-				size="sm"
-			>
+			<Button onClick={() => handleAuthorization()} variant="outline" size="sm">
 				<Music2 className="w-4 h-4 mr-2" />
-				Login with Spotify
+				{authState === "unauthenticated"
+					? "Login with Spotify"
+					: "Select Playlist"}
 			</Button>
 
 			<Dialog open={showPlaylistDialog} onOpenChange={setShowPlaylistDialog}>
