@@ -30,5 +30,5 @@
       ]
     }
   },
-  "include": ["src", "../server/src/lib/spotify/requestAccessToken.ts"]
+  "include": ["src", "../server/src/lib/spotify/requestAccessToken.ts", "../server/src/lib/spotify/getCurrentUsersPlaylists.ts"]
 }

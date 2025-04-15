@@ -3,10 +3,11 @@
 	"private": true,
 	"workspaces": ["packages/*"],
 	"scripts": {
-		"dev": "bun run --cwd packages/server dev & bun run --cwd packages/client dev",
-		"build": "bun run --cwd packages/client build",
-		"start": "bun run --cwd packages/client preview",
-		"test": "bun test --cwd packages/server",
+		"dev:server": "bun run --cwd packages/server dev",
+		"test:server": "bun test --cwd packages/server",
+		"dev:client": "bun run --cwd packages/client dev",
+		"build:client": "bun run --cwd packages/client build",
+		"start:client": "bun run --cwd packages/client preview",
 		"format": "bunx biome format --write .",
 		"lint": "bunx biome check --fix ."
 	},

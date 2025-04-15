@@ -1,6 +1,6 @@
 import { Effect, Schema } from "effect";
+import { SpotifyAuthorizationCodeSchema } from "../shared/types/spotify";
 import { requestAccessToken } from "./src/lib/spotify/requestAccessToken";
-import { RequestAccessTokenParamsSchema } from "./src/lib/spotify/requestAccessToken";
 
 Bun.serve({
 	port: 3000,
@@ -11,10 +11,9 @@ Bun.serve({
 				const program = Effect.gen(function* () {
 					const body = yield* Effect.tryPromise(() => req.json());
 					const code = yield* Schema.decodeUnknown(
-						RequestAccessTokenParamsSchema,
+						SpotifyAuthorizationCodeSchema,
 					)(body);
 					const accessToken = yield* requestAccessToken(code);
-					console.log(accessToken);
 					return accessToken;
 				}).pipe(
 					Effect.match({
@@ -35,6 +34,7 @@ Bun.serve({
 					}),
 				);
 				const result = await Effect.runPromise(program);
+				console.log("server result", result);
 				return result;
 			},
 		},

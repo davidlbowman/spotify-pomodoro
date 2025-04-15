@@ -12,10 +12,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { getAccessToken } from "@/lib/spotify/getAccessToken";
 import { getAuthorizationURL } from "@/lib/spotify/getAuthorizationUrl";
 import { Effect } from "effect";
 import { Loader2, Music2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const playlists = [
 	{
@@ -31,31 +32,30 @@ export default function SpotifyLogin() {
 	const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [authState, setAuthState] = useState<AuthState>("unauthenticated");
-	const [accessToken, setAccessToken] = useState<string | null>(null);
 	const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
 
-	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const code = urlParams.get("code");
-		if (code) {
-			setAuthState("authenticating");
-			fetch("http://localhost:3000/api/spotify/requestAccessToken", {
-				method: "POST",
-				body: JSON.stringify({ code }),
-			})
-				.then((res) => res.json())
-				.then((token) => {
-					setAccessToken(token.access_token);
-					setAuthState("authenticated");
-					window.history.replaceState({}, "", window.location.pathname);
-				})
-				.catch(() => setAuthState("unauthenticated"));
-		}
-	}, []);
+	const urlParams = new URLSearchParams(window.location.search);
+	const code = urlParams.get("code");
+	if (code) {
+		localStorage.setItem("code", code);
+		setAuthState("authenticating");
+		window.history.replaceState({}, "", window.location.pathname);
+	}
+	console.log("authState", authState);
+	console.log("code", code);
+	console.log("la code", localStorage.getItem("code"));
+	console.log("la access_token", localStorage.getItem("spotify_access_token"));
 
 	const handleAuthorization = () => {
 		const authorizationUrl = Effect.runSync(getAuthorizationURL());
 		window.location.href = authorizationUrl;
+	};
+
+	const handleAuthentication = async () => {
+		const code = localStorage.getItem("code") || "broken";
+		console.log("code in auth", code);
+		const accessToken = await Effect.runPromise(getAccessToken({ code }));
+		localStorage.setItem("spotify_access_token", accessToken.access_token);
 	};
 
 	const handlePlaylistSelect = (playlistId: string) => {
@@ -64,11 +64,19 @@ export default function SpotifyLogin() {
 
 	return (
 		<>
-			<Button onClick={() => handleAuthorization()} variant="outline" size="sm">
+			<Button
+				onClick={() =>
+					authState === "unauthenticated"
+						? handleAuthorization()
+						: handleAuthentication()
+				}
+				variant="outline"
+				size="sm"
+			>
 				<Music2 className="w-4 h-4 mr-2" />
 				{authState === "unauthenticated"
-					? "Login with Spotify"
-					: "Select Playlist"}
+					? "Log into Spotify"
+					: "Auth with Spotify"}
 			</Button>
 
 			<Dialog open={showPlaylistDialog} onOpenChange={setShowPlaylistDialog}>

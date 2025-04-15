@@ -3,23 +3,16 @@ import {
 	EnvironmentError,
 	SpotifyError,
 } from "../../../../client/src/types/errors";
+import {
+	SpotifyAccessTokenSchema,
+	type SpotifyAuthorizationCode,
+	SpotifyAuthorizationCodeSchema,
+} from "../../../../shared/types/spotify";
 
-export const RequestAccessTokenParamsSchema = Schema.Struct({
-	code: Schema.NonEmptyString,
-});
-
-type RequestAccessTokenParams = typeof RequestAccessTokenParamsSchema.Type;
-
-export const RequestAccessTokenResponseSchema = Schema.Struct({
-	access_token: Schema.NonEmptyString,
-	token_type: Schema.NonEmptyString,
-	expires_in: Schema.Number,
-});
-
-export const requestAccessToken = (params: RequestAccessTokenParams) =>
+export const requestAccessToken = (params: SpotifyAuthorizationCode) =>
 	Effect.gen(function* () {
 		const { code } = yield* Schema.decodeUnknown(
-			RequestAccessTokenParamsSchema,
+			SpotifyAuthorizationCodeSchema,
 		)(params);
 
 		const spotifyClientId = Bun.env.SPOTIFY_CLIENT_ID;
@@ -46,7 +39,7 @@ export const requestAccessToken = (params: RequestAccessTokenParams) =>
 				return fetch("https://accounts.spotify.com/api/token", {
 					method: "POST",
 					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
+						"content-type": "application/x-www-form-urlencoded",
 						Authorization: `Basic ${credentials}`,
 					},
 					body: bodyParams,
@@ -56,15 +49,17 @@ export const requestAccessToken = (params: RequestAccessTokenParams) =>
 				new SpotifyError({ reason: `Failed to fetch access token: ${error}` }),
 		});
 
+		console.log(response);
+
 		const jsonData = yield* Effect.tryPromise({
 			try: () => response.json(),
 			catch: (error) =>
 				new SpotifyError({ reason: `Failed to parse response: ${error}` }),
 		});
 
-		const parsedData = yield* Schema.decodeUnknown(
-			RequestAccessTokenResponseSchema,
-		)(jsonData);
+		const parsedData = yield* Schema.decodeUnknown(SpotifyAccessTokenSchema)(
+			jsonData,
+		);
 
 		return parsedData;
 	});
