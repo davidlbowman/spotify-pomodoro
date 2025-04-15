@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { getAccessToken } from "@/lib/spotify/getAccessToken";
 import { getAuthorizationURL } from "@/lib/spotify/getAuthorizationUrl";
+import { getCurrentUsersPlaylists } from "@/lib/spotify/getCurrentUsersPlaylists";
 import { Effect } from "effect";
 import { Loader2, Music2 } from "lucide-react";
 import { useState } from "react";
@@ -56,24 +57,35 @@ export default function SpotifyLogin() {
 		}
 	};
 
+	const handleSelectPlaylist = async () => {
+		const token = localStorage.getItem("spotify_access_token") || "broken";
+		const playlists = await Effect.runPromise(
+			getCurrentUsersPlaylists({
+				access_token: token,
+			}),
+		);
+		console.log(playlists);
+	};
+
 	const handlePlaylistSelect = (playlistId: string) => {
 		setSelectedPlaylist(playlistId);
 	};
 
-	const buttonConfig = {
-		unauthenticated: {
-			action: handleAuthorization,
-			text: "Login to Spotify",
-		},
-		authenticating: {
-			action: handleAuthentication,
-			text: "Auth with Spotify",
-		},
-		authenticated: {
-			action: () => console.log("clicked"),
-			text: "Select Playlist",
-		},
-	};
+	const buttonConfig: Record<AuthState, { text: string; action: () => void }> =
+		{
+			unauthenticated: {
+				text: "Login to Spotify",
+				action: handleAuthorization,
+			},
+			authenticating: {
+				text: "Auth with Spotify",
+				action: handleAuthentication,
+			},
+			authenticated: {
+				text: "Select Playlist",
+				action: handleSelectPlaylist,
+			},
+		};
 
 	return (
 		<>
