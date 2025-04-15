@@ -51,6 +51,8 @@ export const PlayListItemsSchema = Schema.Struct({
 	uri: Schema.String,
 });
 
+export type PlayListItems = typeof PlayListItemsSchema.Type;
+
 export const SpotifyPlaylistsResponseSchema = Schema.Struct({
 	href: Schema.String,
 	limit: Schema.Number,
