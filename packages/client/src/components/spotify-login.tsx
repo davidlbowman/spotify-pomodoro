@@ -41,10 +41,6 @@ export default function SpotifyLogin() {
 		setAuthState("authenticating");
 		window.history.replaceState({}, "", window.location.pathname);
 	}
-	console.log("authState", authState);
-	console.log("code", code);
-	console.log("la code", localStorage.getItem("code"));
-	console.log("la access_token", localStorage.getItem("spotify_access_token"));
 
 	const handleAuthorization = () => {
 		const authorizationUrl = Effect.runSync(getAuthorizationURL());
@@ -53,30 +49,41 @@ export default function SpotifyLogin() {
 
 	const handleAuthentication = async () => {
 		const code = localStorage.getItem("code") || "broken";
-		console.log("code in auth", code);
 		const accessToken = await Effect.runPromise(getAccessToken({ code }));
-		localStorage.setItem("spotify_access_token", accessToken.access_token);
+		if (accessToken) {
+			localStorage.setItem("spotify_access_token", accessToken.access_token);
+			setAuthState("authenticated");
+		}
 	};
 
 	const handlePlaylistSelect = (playlistId: string) => {
 		setSelectedPlaylist(playlistId);
 	};
 
+	const buttonConfig = {
+		unauthenticated: {
+			action: handleAuthorization,
+			text: "Login to Spotify",
+		},
+		authenticating: {
+			action: handleAuthentication,
+			text: "Auth with Spotify",
+		},
+		authenticated: {
+			action: () => console.log("clicked"),
+			text: "Select Playlist",
+		},
+	};
+
 	return (
 		<>
 			<Button
-				onClick={() =>
-					authState === "unauthenticated"
-						? handleAuthorization()
-						: handleAuthentication()
-				}
+				onClick={buttonConfig[authState].action}
 				variant="outline"
 				size="sm"
 			>
 				<Music2 className="w-4 h-4 mr-2" />
-				{authState === "unauthenticated"
-					? "Log into Spotify"
-					: "Auth with Spotify"}
+				{buttonConfig[authState].text}
 			</Button>
 
 			<Dialog open={showPlaylistDialog} onOpenChange={setShowPlaylistDialog}>

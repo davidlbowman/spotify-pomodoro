@@ -34,7 +34,6 @@ Bun.serve({
 					}),
 				);
 				const result = await Effect.runPromise(program);
-				console.log("server result", result);
 				return result;
 			},
 		},

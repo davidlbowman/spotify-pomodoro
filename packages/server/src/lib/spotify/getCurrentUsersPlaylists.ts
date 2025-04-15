@@ -24,6 +24,5 @@ export const getCurrentUsersPlaylists = (params: SpotifyAccessToken) =>
 				new SpotifyError({ reason: `Failed to fetch playlists: ${error}` }),
 		});
 
-		console.log(response);
 		return response;
 	});

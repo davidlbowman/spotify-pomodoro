@@ -49,8 +49,6 @@ export const requestAccessToken = (params: SpotifyAuthorizationCode) =>
 				new SpotifyError({ reason: `Failed to fetch access token: ${error}` }),
 		});
 
-		console.log(response);
-
 		const jsonData = yield* Effect.tryPromise({
 			try: () => response.json(),
 			catch: (error) =>
