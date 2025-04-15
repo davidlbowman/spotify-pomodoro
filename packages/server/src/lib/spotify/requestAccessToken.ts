@@ -45,9 +45,14 @@ export const requestAccessToken = (params: SpotifyAuthorizationCode) =>
 					body: bodyParams,
 				});
 			},
-			catch: (error) =>
-				new SpotifyError({ reason: `Failed to fetch access token: ${error}` }),
+			catch: (error) => {
+				const reason = `Failed to fetch access token: ${error}`;
+				Effect.logError(reason);
+				new SpotifyError({ reason });
+			},
 		});
+
+		Effect.logInfo("Spotify said YES!");
 
 		const jsonData = yield* Effect.tryPromise({
 			try: () => response.json(),
@@ -60,4 +65,4 @@ export const requestAccessToken = (params: SpotifyAuthorizationCode) =>
 		);
 
 		return parsedData;
-	});
+	}).pipe(Effect.withSpan("request-access-token"));

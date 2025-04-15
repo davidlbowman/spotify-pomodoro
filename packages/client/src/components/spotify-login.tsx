@@ -16,7 +16,7 @@ import { getAccessToken } from "@/lib/spotify/getAccessToken";
 import { getAuthorizationURL } from "@/lib/spotify/getAuthorizationUrl";
 import { getCurrentUsersPlaylists } from "@/lib/spotify/getCurrentUsersPlaylists";
 import { Effect } from "effect";
-import { Loader2, Music2 } from "lucide-react";
+import { Music2 } from "lucide-react";
 import { useState } from "react";
 import type { PlayListItems } from "../../../shared/types/spotify";
 
@@ -24,7 +24,6 @@ type AuthState = "unauthenticated" | "authenticating" | "authenticated";
 
 export default function SpotifyLogin() {
 	const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
-	const [loading, setLoading] = useState(false);
 	const [playlists, setPlaylists] = useState<PlayListItems[] | null>(null);
 	const [authState, setAuthState] = useState<AuthState>("unauthenticated");
 	const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);

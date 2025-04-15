@@ -1,6 +1,16 @@
+import { NodeSdk } from "@effect/opentelemetry";
+import {
+	BatchSpanProcessor,
+	ConsoleSpanExporter,
+} from "@opentelemetry/sdk-trace-base";
 import { Effect, Schema } from "effect";
 import { SpotifyAuthorizationCodeSchema } from "../shared/types/spotify";
 import { requestAccessToken } from "./src/lib/spotify/requestAccessToken";
+
+const NodeSdkLive = NodeSdk.layer(() => ({
+	resource: { serviceName: "spotify-pomodoro" },
+	spanProcessor: new BatchSpanProcessor(new ConsoleSpanExporter()),
+}));
 
 Bun.serve({
 	port: 3000,
@@ -16,6 +26,7 @@ Bun.serve({
 					const accessToken = yield* requestAccessToken(code);
 					return accessToken;
 				}).pipe(
+					Effect.withSpan("request-access-token"),
 					Effect.match({
 						onFailure: () => {
 							return new Response(JSON.stringify(false), {
@@ -33,7 +44,9 @@ Bun.serve({
 						},
 					}),
 				);
-				const result = await Effect.runPromise(program);
+				const result = await Effect.runPromise(
+					program.pipe(Effect.provide(NodeSdkLive)),
+				);
 				return result;
 			},
 		},
