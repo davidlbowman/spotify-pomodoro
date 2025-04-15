@@ -18,20 +18,14 @@ import { getCurrentUsersPlaylists } from "@/lib/spotify/getCurrentUsersPlaylists
 import { Effect } from "effect";
 import { Loader2, Music2 } from "lucide-react";
 import { useState } from "react";
-
-const playlists = [
-	{
-		id: "1",
-		name: "Playlist 1",
-		owner: { display_name: "John Doe" },
-	},
-];
+import type { PlayListItems } from "../../../shared/types/spotify";
 
 type AuthState = "unauthenticated" | "authenticating" | "authenticated";
 
 export default function SpotifyLogin() {
 	const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [playlists, setPlaylists] = useState<PlayListItems[] | null>(null);
 	const [authState, setAuthState] = useState<AuthState>("unauthenticated");
 	const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
 
@@ -64,7 +58,8 @@ export default function SpotifyLogin() {
 				access_token: token,
 			}),
 		);
-		console.log(playlists);
+		setPlaylists([...playlists]);
+		setShowPlaylistDialog(true);
 	};
 
 	const handlePlaylistSelect = (playlistId: string) => {
@@ -103,11 +98,7 @@ export default function SpotifyLogin() {
 					<DialogHeader>
 						<DialogTitle>Choose a Playlist</DialogTitle>
 					</DialogHeader>
-					{loading ? (
-						<div className="flex items-center justify-center py-8">
-							<Loader2 className="w-6 h-6 animate-spin" />
-						</div>
-					) : (
+					{playlists && (
 						<Select
 							value={selectedPlaylist ?? undefined}
 							onValueChange={handlePlaylistSelect}

@@ -1,9 +1,9 @@
+import { Effect, Schema } from "effect";
 import {
-	SpotifyAccessTokenSchema,
 	type SpotifyAccessToken,
+	SpotifyAccessTokenSchema,
 	SpotifyPlaylistsResponseSchema,
 } from "./../../../../shared/types/spotify";
-import { Effect, Schema } from "effect";
 
 export const getCurrentUsersPlaylists = (params: {
 	access_token: SpotifyAccessToken["access_token"];
@@ -26,9 +26,11 @@ export const getCurrentUsersPlaylists = (params: {
 
 		const jsonResponse = yield* Effect.tryPromise(() => response.json());
 
-		const playlists = yield* Schema.decodeUnknown(
+		const parsedResponse = yield* Schema.decodeUnknown(
 			SpotifyPlaylistsResponseSchema,
 		)(jsonResponse);
+
+		const playlists = parsedResponse.items;
 
 		return playlists;
 	});
