@@ -15,10 +15,13 @@ import {
 import { getAccessToken } from "@/lib/spotify/getAccessToken";
 import { getAuthorizationURL } from "@/lib/spotify/getAuthorizationUrl";
 import { getCurrentUsersPlaylists } from "@/lib/spotify/getCurrentUsersPlaylists";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { Music2 } from "lucide-react";
 import { useState } from "react";
-import type { PlayListItems } from "../../../shared/types/spotify";
+import {
+	SpotifyAuthorizationCodeSchema,
+	type PlayListItems,
+} from "../../../shared/types/spotify";
 
 type AuthState = "unauthenticated" | "authenticating" | "authenticated";
 
@@ -43,7 +46,10 @@ export default function SpotifyLogin() {
 
 	const handleAuthentication = async () => {
 		const code = localStorage.getItem("code") || "broken";
-		const accessToken = await Effect.runPromise(getAccessToken({ code }));
+		const encodedCode = Schema.encodeSync(SpotifyAuthorizationCodeSchema)({
+			code,
+		});
+		const accessToken = await Effect.runPromise(getAccessToken(encodedCode));
 		if (accessToken) {
 			localStorage.setItem("spotify_access_token", accessToken.access_token);
 			setAuthState("authenticated");
@@ -80,8 +86,6 @@ export default function SpotifyLogin() {
 				action: handleSelectPlaylist,
 			},
 		};
-
-	console.log(authState);
 
 	return (
 		<>
