@@ -52,7 +52,7 @@ export const requestAccessToken = (params: SpotifyAuthorizationCode) =>
 			},
 		});
 
-		Effect.logInfo("Spotify said YES!");
+		yield* Effect.log("Spotify said YES!");
 
 		const jsonData = yield* Effect.tryPromise({
 			try: () => response.json(),
