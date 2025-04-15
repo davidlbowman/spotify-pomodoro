@@ -30,14 +30,20 @@ Bun.serve({
 					Effect.match({
 						onFailure: () => {
 							return new Response(JSON.stringify(false), {
-								headers: {},
+								headers: {
+									"Access-Control-ALlow-Origin": "*",
+									"Content-Type": "application/json",
+								},
 								status: 401,
 								statusText: "Unauthorized",
 							});
 						},
 						onSuccess: (accessToken) => {
 							return new Response(JSON.stringify(accessToken), {
-								headers: {},
+								headers: {
+									"Access-Control-ALlow-Origin": "*",
+									"Content-Type": "application/json",
+								},
 								status: 201,
 								statusText: "Created",
 							});

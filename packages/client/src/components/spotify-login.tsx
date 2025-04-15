@@ -81,6 +81,8 @@ export default function SpotifyLogin() {
 			},
 		};
 
+	console.log(authState);
+
 	return (
 		<>
 			<Button
