@@ -19,6 +19,9 @@
 			"recommended": true,
 			"correctness": {
 				"noUnusedImports": "off"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "off"
 			}
 		}
 	},

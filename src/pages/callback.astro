@@ -1,6 +1,6 @@
 ---
 import "@/styles/global.css";
-import { App } from "@/components/App";
+import { SpotifyCallback } from "@/components/SpotifyCallback";
 ---
 
 <html lang="en">
@@ -8,11 +8,9 @@ import { App } from "@/components/App";
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Spotify Pomodoro</title>
-		<meta name="description" content="A pomodoro timer that integrates with Spotify" />
+		<title>Connecting... | Spotify Pomodoro</title>
 	</head>
 	<body class="min-h-screen bg-background text-foreground antialiased">
-		<App client:load />
+		<SpotifyCallback client:load />
 	</body>
 </html>
