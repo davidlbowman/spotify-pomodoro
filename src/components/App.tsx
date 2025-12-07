@@ -264,9 +264,7 @@ export function App() {
 								</span>
 							)}
 
-							<span className={cn("mx-1", isRunning && "animate-blink-colon")}>
-								:
-							</span>
+							<span className="mx-1">:</span>
 
 							<span className="digit-transition inline-block w-[1.4em] text-center">
 								{seconds}

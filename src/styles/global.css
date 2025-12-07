@@ -45,51 +45,52 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Light mode */
+/* Light mode - warm parchment, readable contrast */
 :root {
   --radius: 1rem;
-  --background: #f8f5f0;
-  --foreground: #3d3a4e;
-  --card: #ffffff;
-  --card-foreground: #3d3a4e;
-  --popover: #ffffff;
-  --popover-foreground: #3d3a4e;
-  --primary: #c4908a;
+  --background: #f0ebe4;
+  --foreground: #2d2a3e;
+  --card: #faf8f5;
+  --card-foreground: #2d2a3e;
+  --popover: #faf8f5;
+  --popover-foreground: #2d2a3e;
+  --primary: #a67570;
   --primary-foreground: #ffffff;
-  --secondary: #ebe6df;
-  --secondary-foreground: #3d3a4e;
-  --muted: #ebe6df;
-  --muted-foreground: #7a7586;
-  --accent: #a89bb0;
-  --accent-foreground: #3d3a4e;
-  --destructive: #d4726a;
-  --border: rgba(61, 58, 78, 0.1);
-  --input: rgba(61, 58, 78, 0.08);
-  --ring: #c4908a;
-  --chart-1: #c4908a;
-  --chart-2: #a89bb0;
-  --chart-3: #9ab5a0;
-  --chart-4: #e8b86d;
-  --chart-5: #7fa990;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #3d3a4e;
-  --sidebar-primary: #c4908a;
+  --secondary: #e5ded5;
+  --secondary-foreground: #2d2a3e;
+  --muted: #e5ded5;
+  --muted-foreground: #5a5668;
+  --accent: #8a7d94;
+  --accent-foreground: #2d2a3e;
+  --destructive: #c45a52;
+  --border: rgba(45, 42, 62, 0.12);
+  --input: rgba(45, 42, 62, 0.1);
+  --ring: #a67570;
+  --chart-1: #a67570;
+  --chart-2: #8a7d94;
+  --chart-3: #6a9a78;
+  --chart-4: #d49545;
+  --chart-5: #5a8a68;
+  --sidebar: #faf8f5;
+  --sidebar-foreground: #2d2a3e;
+  --sidebar-primary: #a67570;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ebe6df;
-  --sidebar-accent-foreground: #3d3a4e;
-  --sidebar-border: rgba(61, 58, 78, 0.1);
-  --sidebar-ring: #c4908a;
+  --sidebar-accent: #e5ded5;
+  --sidebar-accent-foreground: #2d2a3e;
+  --sidebar-border: rgba(45, 42, 62, 0.12);
+  --sidebar-ring: #a67570;
 
-  --lofi-focus: #7fa990;
-  --lofi-focus-bg: rgba(127, 169, 144, 0.12);
-  --lofi-break: #a89bb0;
-  --lofi-break-bg: rgba(168, 155, 176, 0.12);
-  --lofi-overtime: #e8a655;
-  --lofi-overtime-bg: rgba(232, 166, 85, 0.12);
-  --lofi-idle: #c4908a;
-  --lofi-idle-bg: rgba(196, 144, 138, 0.08);
-  --lofi-vinyl: #3d3a4e;
-  --lofi-vinyl-groove: rgba(61, 58, 78, 0.08);
+  /* Lofi colors - deeper for light mode readability */
+  --lofi-focus: #4a8a5e;
+  --lofi-focus-bg: rgba(74, 138, 94, 0.15);
+  --lofi-break: #7a6a8a;
+  --lofi-break-bg: rgba(122, 106, 138, 0.15);
+  --lofi-overtime: #d48a35;
+  --lofi-overtime-bg: rgba(212, 138, 53, 0.15);
+  --lofi-idle: #a67570;
+  --lofi-idle-bg: rgba(166, 117, 112, 0.12);
+  --lofi-vinyl: #c4bab0;
+  --lofi-vinyl-groove: rgba(45, 42, 62, 0.1);
 }
 
 /* Dark mode */
@@ -155,9 +156,9 @@
 
   body {
     background:
-      radial-gradient(ellipse at 20% 80%, rgba(168, 155, 176, 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(196, 144, 138, 0.06) 0%, transparent 50%),
-      #f8f5f0;
+      radial-gradient(ellipse at 20% 80%, rgba(138, 125, 148, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(166, 117, 112, 0.08) 0%, transparent 50%),
+      #f0ebe4;
   }
 
   .dark body {
@@ -261,6 +262,12 @@
 .timer-display {
   font-size: clamp(6rem, 18vw, 15rem);
   line-height: 1;
+}
+
+/* Ensure buttons inherit font size */
+.timer-display button {
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .timer-display-input {
