@@ -1,78 +1,119 @@
 # Spotify Pomodoro
 
-A pomodoro timer app that integrates with your Spotify account to play music during focus sessions.
+A lofi-styled pomodoro timer with Spotify integration. Focus on your work while your favorite playlists play in the background.
 
 ## Features
 
-- Configurable focus and break durations
+- Configurable focus and break durations (click the minutes to edit)
+- Timer counts up after completion (overtime mode) - you decide when to take a break
+- Spotify integration with playlist selection
+- Auto-shuffle and repeat for continuous music
+- Light/dark theme toggle
+- Keyboard-first controls
 - Audio notification when timer ends
-- Timer continues counting up after completion (no forced breaks)
-- Spotify integration for playlist selection and playback control
-- Session counter
 
-## Prerequisites
+## Local Development Setup
 
-- [Bun](https://bun.sh) runtime
+### Prerequisites
+
+- [Bun](https://bun.sh/) v1.0+
 - A Spotify Developer account
 
-## Setup
-
-### 1. Create a Spotify App
-
-1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Create a new app
-3. Add `http://localhost:4321/callback` to your Redirect URIs
-4. Note your Client ID
-
-### 2. Configure Environment
+### 1. Clone and Install
 
 ```bash
-cp .env.example .env
+git clone https://github.com/davidlbowman/spotify-pomodoro.git
+cd spotify-pomodoro
+bun install
 ```
 
-Edit `.env` with your Spotify credentials:
+### 2. Create a Spotify App
 
-```
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Click "Create App"
+3. Fill in the details:
+   - **App name:** Spotify Pomodoro (or whatever you prefer)
+   - **App description:** Pomodoro timer with Spotify
+   - **Redirect URI:** `http://localhost:4321/callback`
+   - **APIs used:** Check "Web API"
+4. Click "Save"
+5. In your app's settings, copy the **Client ID**
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
 PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
 PUBLIC_SPOTIFY_REDIRECT_URI=http://localhost:4321/callback
 ```
 
-### 3. Install and Run
+Replace `your_client_id_here` with the Client ID from step 2.
+
+### 4. Start the Development Server
 
 ```bash
-bun install
 bun run dev
 ```
 
 Open [http://localhost:4321](http://localhost:4321) in your browser.
 
-## Commands
+### 5. Connect Spotify
 
-| Command             | Action                                      |
-| :------------------ | :------------------------------------------ |
-| `bun install`       | Install dependencies                        |
-| `bun run dev`       | Start local dev server at `localhost:4321`  |
-| `bun run build`     | Build production site to `./dist/`          |
-| `bun run preview`   | Preview production build locally            |
-| `bun run lint`      | Check for linting issues                    |
-| `bun run lint:fix`  | Fix linting issues                          |
-| `bun run typecheck` | Run TypeScript type checking                |
+1. Click the "spotify" button
+2. Authorize the app with your Spotify account
+3. Select a playlist and start focusing!
+
+## Keyboard Controls
+
+| Key | Action |
+|-----|--------|
+| `Space` / `Enter` | Start/pause timer |
+| `R` | Reset timer (when paused or in overtime) |
+| `S` | Switch phase (when in overtime) |
 
 ## Tech Stack
 
-- [Astro](https://astro.build) - Web framework
-- [React](https://react.dev) - UI components
-- [Effect](https://effect.website) - Typed functional programming
-- [Tailwind CSS](https://tailwindcss.com) - Styling
-- [shadcn/ui](https://ui.shadcn.com) - Component library
-- [Biome](https://biomejs.dev) - Linting and formatting
+- **Runtime:** Bun
+- **Framework:** Astro with React
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **State Management:** Effect-TS
+- **Linting:** Biome
 
-## Usage
+## Available Scripts
 
-1. Click "Connect with Spotify" to authenticate
-2. Set your desired focus and break durations
-3. Select a playlist to play during your session
-4. Click "Start" to begin your pomodoro
-5. When the timer ends, you'll hear a notification sound
-6. The timer will continue counting up - take your break when ready
-7. Click "Switch to Break" when you're ready for your break
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start development server |
+| `bun run build` | Build for production |
+| `bun run preview` | Preview production build |
+| `bun run lint` | Check for linting issues |
+| `bun run lint:fix` | Auto-fix linting issues |
+| `bun run typecheck` | Run TypeScript type checking |
+
+## Troubleshooting
+
+### "Invalid redirect URI"
+
+Make sure the redirect URI in your Spotify app settings exactly matches `PUBLIC_SPOTIFY_REDIRECT_URI` in your `.env` file, including the protocol (`http://` vs `https://`).
+
+### "No active device"
+
+Spotify requires an active device to control playback. Open Spotify on your computer or phone before selecting a playlist.
+
+### Timer notification not playing
+
+Browser autoplay policies may block audio. Interact with the page (click anywhere) before the timer ends to enable audio.
+
+## Questions or Issues?
+
+- [Report a bug](https://github.com/davidlbowman/spotify-pomodoro/issues/new?template=bug_report.md)
+- [Request a feature](https://github.com/davidlbowman/spotify-pomodoro/issues/new?template=feature_request.md)
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
+
+## License
+
+MIT
