@@ -1,6 +1,20 @@
+/**
+ * Pomodoro timer service with countdown, overtime, and phase management.
+ *
+ * @module
+ */
+
 import { Effect, Option, Ref, SubscriptionRef } from "effect";
 import { TimerConfig, type TimerPhase, TimerState } from "../schema/TimerState";
 
+/**
+ * Timer service for managing pomodoro sessions.
+ *
+ * Provides countdown timer with focus/break phases and overtime tracking.
+ *
+ * @since 0.0.1
+ * @category Services
+ */
 export class Timer extends Effect.Service<Timer>()("Timer", {
 	effect: Effect.gen(function* () {
 		const stateRef = yield* SubscriptionRef.make(
@@ -47,7 +61,6 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 						}),
 					);
 
-					// Fire callback on first overtime tick
 					if (currentState.overtime === 0) {
 						const callback = yield* Ref.get(onTimerEndRef);
 						yield* Option.match(callback, {
@@ -59,17 +72,14 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 			});
 
 		const startTicking = Effect.gen(function* () {
-			// Clear any existing interval
 			const existingInterval = yield* Ref.get(intervalRef);
 			yield* Option.match(existingInterval, {
 				onNone: () => Effect.void,
 				onSome: (id) => Effect.sync(() => clearInterval(id)),
 			});
 
-			// Create new interval using browser setInterval
 			const id = yield* Effect.sync(() =>
 				setInterval(() => {
-					// Run tick effect synchronously in the runtime
 					Effect.runSync(tick());
 				}, 1000),
 			);

@@ -1,7 +1,19 @@
+/**
+ * React hook for theme management.
+ *
+ * @module
+ */
+
 import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
+/**
+ * Hook for managing light/dark theme with localStorage persistence.
+ *
+ * @since 0.0.1
+ * @category Hooks
+ */
 export function useTheme() {
 	const [theme, setThemeState] = useState<Theme>(() => {
 		if (typeof window === "undefined") return "dark";

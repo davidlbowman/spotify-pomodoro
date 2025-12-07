@@ -1,3 +1,9 @@
+/**
+ * React hook for timer state and controls.
+ *
+ * @module
+ */
+
 import { Effect, Stream, SubscriptionRef } from "effect";
 import { useCallback, useEffect, useState } from "react";
 import { getRuntime, runEffect } from "../effect/runtime";
@@ -5,6 +11,12 @@ import { TimerConfig, type TimerState } from "../effect/schema/TimerState";
 import { AudioNotification } from "../effect/services/AudioNotification";
 import { Timer } from "../effect/services/Timer";
 
+/**
+ * Hook for managing pomodoro timer state and controls.
+ *
+ * @since 0.0.1
+ * @category Hooks
+ */
 export function useTimer() {
 	const [state, setState] = useState<TimerState | null>(null);
 

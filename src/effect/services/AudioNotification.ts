@@ -1,5 +1,19 @@
+/**
+ * Audio notification service using Web Audio API.
+ *
+ * @module
+ */
+
 import { Effect, Option, Ref } from "effect";
 
+/**
+ * Audio notification service.
+ *
+ * Plays synthesized chime sounds for timer events.
+ *
+ * @since 0.0.1
+ * @category Services
+ */
 export class AudioNotification extends Effect.Service<AudioNotification>()(
 	"AudioNotification",
 	{
@@ -19,26 +33,21 @@ export class AudioNotification extends Effect.Service<AudioNotification>()(
 					onNone: () => Effect.void,
 					onSome: (ctx) =>
 						Effect.sync(() => {
-							// Resume context if suspended (browser autoplay policy)
 							if (ctx.state === "suspended") {
 								ctx.resume();
 							}
 
-							// Create a pleasant notification sound
 							const oscillator = ctx.createOscillator();
 							const gainNode = ctx.createGain();
 
 							oscillator.connect(gainNode);
 							gainNode.connect(ctx.destination);
 
-							// Two-tone notification (like a gentle chime)
 							const now = ctx.currentTime;
 
-							// First tone
-							oscillator.frequency.setValueAtTime(880, now); // A5
-							oscillator.frequency.setValueAtTime(660, now + 0.15); // E5
+							oscillator.frequency.setValueAtTime(880, now);
+							oscillator.frequency.setValueAtTime(660, now + 0.15);
 
-							// Envelope (louder volume)
 							gainNode.gain.setValueAtTime(0, now);
 							gainNode.gain.linearRampToValueAtTime(0.9, now + 0.02);
 							gainNode.gain.linearRampToValueAtTime(0.6, now + 0.15);

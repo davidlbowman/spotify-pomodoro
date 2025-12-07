@@ -1,7 +1,19 @@
+/**
+ * Spotify login card component.
+ *
+ * @module
+ */
+
 import { useSpotifyAuth } from "../hooks/useSpotify";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
+/**
+ * Card for Spotify authentication status and login/logout.
+ *
+ * @since 0.0.1
+ * @category Components
+ */
 export function SpotifyLogin() {
 	const { isAuthenticated, isLoading, login, logout } = useSpotifyAuth();
 

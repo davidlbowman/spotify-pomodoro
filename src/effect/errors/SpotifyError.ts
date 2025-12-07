@@ -1,5 +1,17 @@
+/**
+ * Spotify API and authentication errors.
+ *
+ * @module
+ */
+
 import { Schema } from "effect";
 
+/**
+ * Authentication error during OAuth flow.
+ *
+ * @since 0.0.1
+ * @category Errors
+ */
 export class SpotifyAuthError extends Schema.TaggedError<SpotifyAuthError>()(
 	"SpotifyAuthError",
 	{
@@ -13,6 +25,12 @@ export class SpotifyAuthError extends Schema.TaggedError<SpotifyAuthError>()(
 	},
 ) {}
 
+/**
+ * Error from Spotify Web API calls.
+ *
+ * @since 0.0.1
+ * @category Errors
+ */
 export class SpotifyApiError extends Schema.TaggedError<SpotifyApiError>()(
 	"SpotifyApiError",
 	{

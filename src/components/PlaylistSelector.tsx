@@ -1,3 +1,9 @@
+/**
+ * Playlist selector card component.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from "react";
 import type { Playlist } from "../effect/schema/Playlist";
 import {
@@ -9,6 +15,12 @@ import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
+/**
+ * Card for selecting and controlling Spotify playlist playback.
+ *
+ * @since 0.0.1
+ * @category Components
+ */
 export function PlaylistSelector() {
 	const { isAuthenticated } = useSpotifyAuth();
 	const { playlists, isLoading, error, fetchPlaylists } = useSpotifyPlaylists();

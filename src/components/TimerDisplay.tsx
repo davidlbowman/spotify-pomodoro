@@ -1,8 +1,20 @@
+/**
+ * Timer display card component.
+ *
+ * @module
+ */
+
 import { useTimer } from "../hooks/useTimer";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
+/**
+ * Card displaying timer with controls.
+ *
+ * @since 0.0.1
+ * @category Components
+ */
 export function TimerDisplay() {
 	const { state, start, pause, reset, switchPhase } = useTimer();
 

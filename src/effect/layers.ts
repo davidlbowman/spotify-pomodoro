@@ -1,3 +1,9 @@
+/**
+ * Effect layer composition for application services.
+ *
+ * @module
+ */
+
 import { FetchHttpClient } from "@effect/platform";
 import { Layer } from "effect";
 import { AudioNotification } from "./services/AudioNotification";
@@ -14,6 +20,12 @@ const SpotifyClientLive = SpotifyClient.Default.pipe(
 	Layer.provide(FetchHttpClient.layer),
 );
 
+/**
+ * Main application layer with all services.
+ *
+ * @since 0.0.1
+ * @category Layers
+ */
 export const MainLayer = Layer.mergeAll(
 	SpotifyAuthLive,
 	SpotifyClientLive,
@@ -21,4 +33,10 @@ export const MainLayer = Layer.mergeAll(
 	AudioNotification.Default,
 );
 
+/**
+ * Context type for the main layer.
+ *
+ * @since 0.0.1
+ * @category Layers
+ */
 export type MainContext = Layer.Layer.Success<typeof MainLayer>;

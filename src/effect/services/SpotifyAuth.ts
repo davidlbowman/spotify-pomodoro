@@ -1,3 +1,9 @@
+/**
+ * Spotify OAuth authentication service using PKCE flow.
+ *
+ * @module
+ */
+
 import { HttpClient, HttpClientRequest } from "@effect/platform";
 import { Effect, Option, Ref } from "effect";
 import { SpotifyAuthError } from "../errors/SpotifyError";
@@ -14,9 +20,16 @@ const SCOPES = [
 	"streaming",
 ].join(" ");
 
+/**
+ * Spotify authentication service.
+ *
+ * Handles OAuth PKCE flow, token management, and session persistence.
+ *
+ * @since 0.0.1
+ * @category Services
+ */
 export class SpotifyAuth extends Effect.Service<SpotifyAuth>()("SpotifyAuth", {
 	effect: Effect.gen(function* () {
-		// Disable tracer propagation to avoid b3 header causing CORS issues with Spotify
 		const httpClient = (yield* HttpClient.HttpClient).pipe(
 			HttpClient.withTracerPropagation(false),
 		);

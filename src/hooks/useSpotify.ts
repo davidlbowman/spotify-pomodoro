@@ -1,3 +1,9 @@
+/**
+ * React hooks for Spotify authentication and playback.
+ *
+ * @module
+ */
+
 import { Option } from "effect";
 import { useCallback, useEffect, useState } from "react";
 import { runEffect } from "../effect/runtime";
@@ -5,6 +11,12 @@ import type { PlaybackState, Playlist } from "../effect/schema/Playlist";
 import { SpotifyAuth } from "../effect/services/SpotifyAuth";
 import { SpotifyClient } from "../effect/services/SpotifyClient";
 
+/**
+ * Hook for Spotify OAuth authentication.
+ *
+ * @since 0.0.1
+ * @category Hooks
+ */
 export function useSpotifyAuth() {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +54,12 @@ export function useSpotifyAuth() {
 	};
 }
 
+/**
+ * Hook for fetching user playlists.
+ *
+ * @since 0.0.1
+ * @category Hooks
+ */
 export function useSpotifyPlaylists() {
 	const [playlists, setPlaylists] = useState<Playlist[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +86,12 @@ export function useSpotifyPlaylists() {
 	};
 }
 
+/**
+ * Hook for controlling Spotify playback.
+ *
+ * @since 0.0.1
+ * @category Hooks
+ */
 export function useSpotifyPlayback() {
 	const [playbackState, setPlaybackState] = useState<PlaybackState | null>(
 		null,

@@ -1,3 +1,9 @@
+/**
+ * Main application component with timer and Spotify integration.
+ *
+ * @module
+ */
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Playlist } from "../effect/schema/Playlist";
 import {
@@ -9,6 +15,12 @@ import { useTheme } from "../hooks/useTheme";
 import { useTimer } from "../hooks/useTimer";
 import { cn } from "../lib/utils";
 
+/**
+ * Main pomodoro timer application with Spotify playback controls.
+ *
+ * @since 0.0.1
+ * @category Components
+ */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
 	const { state, start, pause, reset, switchPhase, setConfig } = useTimer();
@@ -38,7 +50,6 @@ export function App() {
 	const phase = state?.phase ?? "idle";
 	const isPlaying = playbackState?.isPlaying ?? false;
 
-	// Parse display time
 	const displayTime = state?.displayTime ?? "25:00";
 	const [sign, timeWithoutSign] = displayTime.startsWith("+")
 		? ["+", displayTime.slice(1)]
@@ -50,17 +61,14 @@ export function App() {
 			? Math.floor((state?.config.breakDuration ?? 300) / 60)
 			: Math.floor((state?.config.focusDuration ?? 1500) / 60);
 
-	// Fetch playlists when authenticated
 	useEffect(() => {
 		if (isAuthenticated) {
 			fetchPlaylists();
 		}
 	}, [isAuthenticated, fetchPlaylists]);
 
-	// Keyboard controls
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			// Don't trigger if editing or in an input
 			if (isEditingMinutes || e.target instanceof HTMLInputElement) return;
 
 			if (e.code === "Space" || e.code === "Enter") {
@@ -137,7 +145,6 @@ export function App() {
 		setSelectedPlaylist(playlist);
 		setShowPlaylists(false);
 		await play({ contextUri: playlist.uri });
-		// Enable shuffle and repeat so playlist loops forever with random songs
 		await setShuffle(true);
 		await setRepeat("context");
 	};
@@ -150,7 +157,6 @@ export function App() {
 		}
 	};
 
-	// Colors based on phase
 	const colorClass = isOvertime
 		? "text-[var(--lofi-overtime)]"
 		: phase === "focus"
@@ -193,7 +199,6 @@ export function App() {
 		>
 			<div className="noise-overlay" />
 
-			{/* Theme toggle */}
 			<header className="fixed top-0 right-0 p-5 z-50">
 				<button
 					type="button"
@@ -209,10 +214,8 @@ export function App() {
 				</button>
 			</header>
 
-			{/* Main centered content */}
 			<main className="flex-1 flex flex-col items-center justify-center px-6">
 				<div className="flex flex-col items-center gap-6">
-					{/* Timer display */}
 					<div
 						className={cn(
 							"relative px-10 py-8 rounded-2xl bg-card/40 backdrop-blur-sm",
@@ -221,7 +224,6 @@ export function App() {
 							glowClass,
 						)}
 					>
-						{/* Phase badge */}
 						{isOvertime ? (
 							<div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-[var(--lofi-overtime-bg)] text-[var(--lofi-overtime)] text-sm tracking-widest uppercase">
 								overtime
@@ -289,7 +291,6 @@ export function App() {
 						</div>
 					</div>
 
-					{/* Keyboard hint */}
 					<span className="text-muted-foreground/40 text-xs tracking-wide">
 						{isRunning
 							? "space to pause"
@@ -299,7 +300,6 @@ export function App() {
 						{isOvertime && " · s to switch"}
 					</span>
 
-					{/* Music section */}
 					<div className="flex items-center gap-4 mt-4">
 						{!isAuthenticated ? (
 							<button
@@ -316,7 +316,6 @@ export function App() {
 							</button>
 						) : (
 							<>
-								{/* Vinyl - 30% larger (w-14 -> w-[4.5rem]) */}
 								<button
 									type="button"
 									onClick={handlePlayPause}
@@ -359,7 +358,6 @@ export function App() {
 									</div>
 								</button>
 
-								{/* Playlist selector - 30% larger */}
 								<div className="relative">
 									<button
 										type="button"
@@ -419,7 +417,6 @@ export function App() {
 									)}
 								</div>
 
-								{/* Disconnect */}
 								<button
 									type="button"
 									onClick={logout}
@@ -433,7 +430,6 @@ export function App() {
 				</div>
 			</main>
 
-			{/* Footer */}
 			<footer className="py-5 text-center">
 				<a
 					href="https://github.com/davidlbowman/spotify-pomodoro"

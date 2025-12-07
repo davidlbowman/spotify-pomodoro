@@ -1,3 +1,9 @@
+/**
+ * Spotify Web API client for playback control and playlist access.
+ *
+ * @module
+ */
+
 import { HttpClient, HttpClientRequest } from "@effect/platform";
 import { Effect } from "effect";
 import { SpotifyApiError } from "../errors/SpotifyError";
@@ -11,11 +17,18 @@ import { SpotifyAuth } from "./SpotifyAuth";
 
 const SPOTIFY_API_BASE = "https://api.spotify.com/v1";
 
+/**
+ * Spotify API client service.
+ *
+ * Provides methods to control playback and fetch user playlists.
+ *
+ * @since 0.0.1
+ * @category Services
+ */
 export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 	"SpotifyClient",
 	{
 		effect: Effect.gen(function* () {
-			// Disable tracer propagation to avoid CORS issues with Spotify API
 			const httpClient = (yield* HttpClient.HttpClient).pipe(
 				HttpClient.withTracerPropagation(false),
 			);

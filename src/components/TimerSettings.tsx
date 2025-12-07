@@ -1,3 +1,9 @@
+/**
+ * Timer settings card component.
+ *
+ * @module
+ */
+
 import { useState } from "react";
 import { useTimer } from "../hooks/useTimer";
 import { Button } from "./ui/button";
@@ -5,6 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+/**
+ * Card for configuring focus and break durations.
+ *
+ * @since 0.0.1
+ * @category Components
+ */
 export function TimerSettings() {
 	const { state, setConfig } = useTimer();
 	const [focusMinutes, setFocusMinutes] = useState(

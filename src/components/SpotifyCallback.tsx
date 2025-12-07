@@ -1,6 +1,18 @@
+/**
+ * Spotify OAuth callback handler component.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from "react";
 import { useSpotifyAuth } from "../hooks/useSpotify";
 
+/**
+ * Handles Spotify OAuth callback and token exchange.
+ *
+ * @since 0.0.1
+ * @category Components
+ */
 export function SpotifyCallback() {
 	const { handleCallback } = useSpotifyAuth();
 	const [error, setError] = useState<string | null>(null);
