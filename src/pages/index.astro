@@ -1,0 +1,20 @@
+---
+import "@/styles/global.css";
+import { Button } from "@/components/ui/button";
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Spotify Pomodoro</title>
+	</head>
+	<body class="min-h-screen bg-background text-foreground">
+		<main class="container mx-auto p-8">
+			<h1 class="text-3xl font-bold mb-4">Spotify Pomodoro</h1>
+			<Button client:load>Get Started</Button>
+		</main>
+	</body>
+</html>
