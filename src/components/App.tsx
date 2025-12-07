@@ -202,7 +202,7 @@ export function App() {
 
 			{/* Main centered content */}
 			<main className="flex-1 flex flex-col items-center justify-center px-6">
-				<div className="flex flex-col items-center gap-8">
+				<div className="flex flex-col items-center gap-6">
 					{/* Timer display */}
 					<div
 						className={cn(
@@ -274,30 +274,15 @@ export function App() {
 						</div>
 					</div>
 
-					{/* Keyboard hint & phase */}
-					<div className="flex flex-col items-center gap-3">
-						<span className="text-muted-foreground/50 text-xs tracking-wide">
-							{isRunning
-								? "space to pause"
-								: isPaused
-									? "space to resume · r to reset"
-									: "space to start"}
-							{isOvertime && " · s to switch"}
-						</span>
-
-						{phase !== "idle" && (
-							<button
-								type="button"
-								onClick={switchPhase}
-								className={cn(
-									"text-xs tracking-widest uppercase transition-all duration-300",
-									"text-muted-foreground/40 hover:text-muted-foreground/70",
-								)}
-							>
-								{phase} {state.sessionCount > 0 && `· ${state.sessionCount}`}
-							</button>
-						)}
-					</div>
+					{/* Keyboard hint */}
+					<span className="text-muted-foreground/40 text-xs tracking-wide">
+						{isRunning
+							? "space to pause"
+							: isPaused
+								? "space to resume · r to reset"
+								: "space to start"}
+						{isOvertime && " · s to switch"}
+					</span>
 
 					{/* Music section */}
 					<div className="flex items-center gap-4 mt-4">
