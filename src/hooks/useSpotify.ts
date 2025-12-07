@@ -99,11 +99,21 @@ export function useSpotifyPlayback() {
 		await fetchPlaybackState();
 	}, [fetchPlaybackState]);
 
+	const setShuffle = useCallback(async (state: boolean) => {
+		await runEffect(SpotifyClient.setShuffle(state));
+	}, []);
+
+	const setRepeat = useCallback(async (state: "off" | "context" | "track") => {
+		await runEffect(SpotifyClient.setRepeat(state));
+	}, []);
+
 	return {
 		playbackState,
 		isLoading,
 		fetchPlaybackState,
 		play,
 		pause,
+		setShuffle,
+		setRepeat,
 	};
 }

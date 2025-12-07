@@ -14,7 +14,13 @@ export function App() {
 	const { state, start, pause, reset, switchPhase, setConfig } = useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
-	const { playbackState, play, pause: pauseMusic } = useSpotifyPlayback();
+	const {
+		playbackState,
+		play,
+		pause: pauseMusic,
+		setShuffle,
+		setRepeat,
+	} = useSpotifyPlayback();
 
 	const [isEditingMinutes, setIsEditingMinutes] = useState(false);
 	const [editValue, setEditValue] = useState("");
@@ -131,6 +137,9 @@ export function App() {
 		setSelectedPlaylist(playlist);
 		setShowPlaylists(false);
 		await play({ contextUri: playlist.uri });
+		// Enable shuffle and repeat so playlist loops forever with random songs
+		await setShuffle(true);
+		await setRepeat("context");
 	};
 
 	const handlePlayPause = async () => {
@@ -212,12 +221,20 @@ export function App() {
 							glowClass,
 						)}
 					>
-						{/* Overtime badge */}
-						{isOvertime && (
-							<div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[var(--lofi-overtime-bg)] text-[var(--lofi-overtime)] text-[10px] tracking-widest uppercase">
+						{/* Phase badge */}
+						{isOvertime ? (
+							<div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-[var(--lofi-overtime-bg)] text-[var(--lofi-overtime)] text-sm tracking-widest uppercase">
 								overtime
 							</div>
-						)}
+						) : phase === "focus" ? (
+							<div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-[var(--lofi-focus-bg)] text-[var(--lofi-focus)] text-sm tracking-widest uppercase">
+								focus
+							</div>
+						) : phase === "break" ? (
+							<div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-[var(--lofi-break-bg)] text-[var(--lofi-break)] text-sm tracking-widest uppercase">
+								break
+							</div>
+						) : null}
 
 						<div
 							className={cn(

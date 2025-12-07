@@ -208,11 +208,63 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 				}),
 			);
 
+			const setShuffle = (state: boolean) =>
+				authorizedFetch((accessToken) =>
+					Effect.gen(function* () {
+						const request = HttpClientRequest.put(
+							`${SPOTIFY_API_BASE}/me/player/shuffle`,
+						).pipe(
+							HttpClientRequest.setHeader(
+								"Authorization",
+								`Bearer ${accessToken}`,
+							),
+							HttpClientRequest.setUrlParams({ state: String(state) }),
+						);
+
+						yield* httpClient.execute(request).pipe(
+							Effect.mapError(
+								() =>
+									new SpotifyApiError({
+										status: 500,
+										message: "Failed to set shuffle mode",
+									}),
+							),
+						);
+					}),
+				);
+
+			const setRepeat = (state: "off" | "context" | "track") =>
+				authorizedFetch((accessToken) =>
+					Effect.gen(function* () {
+						const request = HttpClientRequest.put(
+							`${SPOTIFY_API_BASE}/me/player/repeat`,
+						).pipe(
+							HttpClientRequest.setHeader(
+								"Authorization",
+								`Bearer ${accessToken}`,
+							),
+							HttpClientRequest.setUrlParams({ state }),
+						);
+
+						yield* httpClient.execute(request).pipe(
+							Effect.mapError(
+								() =>
+									new SpotifyApiError({
+										status: 500,
+										message: "Failed to set repeat mode",
+									}),
+							),
+						);
+					}),
+				);
+
 			return {
 				getPlaylists,
 				getPlaybackState,
 				play,
 				pause,
+				setShuffle,
+				setRepeat,
 			};
 		}),
 		accessors: true,

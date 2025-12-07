@@ -38,11 +38,11 @@ export class AudioNotification extends Effect.Service<AudioNotification>()(
 							oscillator.frequency.setValueAtTime(880, now); // A5
 							oscillator.frequency.setValueAtTime(660, now + 0.15); // E5
 
-							// Envelope
+							// Envelope (louder volume)
 							gainNode.gain.setValueAtTime(0, now);
-							gainNode.gain.linearRampToValueAtTime(0.3, now + 0.02);
-							gainNode.gain.linearRampToValueAtTime(0.2, now + 0.15);
-							gainNode.gain.linearRampToValueAtTime(0.3, now + 0.17);
+							gainNode.gain.linearRampToValueAtTime(0.9, now + 0.02);
+							gainNode.gain.linearRampToValueAtTime(0.6, now + 0.15);
+							gainNode.gain.linearRampToValueAtTime(0.9, now + 0.17);
 							gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
 
 							oscillator.start(now);
