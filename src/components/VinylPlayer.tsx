@@ -49,68 +49,43 @@ export function VinylPlayer() {
 		}
 	};
 
-	// Not authenticated state
+	// Not authenticated state - compact inline
 	if (!isAuthenticated) {
 		return (
-			<div className="flex flex-col items-center gap-6">
-				{/* Disconnected vinyl */}
-				<div className="relative">
-					<div
-						className={cn(
-							"w-48 h-48 rounded-full",
-							"bg-gradient-to-br from-[#2d2a3e] to-[#1a1820]",
-							"border border-white/5",
-							"flex items-center justify-center",
-							"shadow-lg",
-						)}
-					>
-						{/* Vinyl grooves */}
-						<div className="absolute inset-4 rounded-full border border-white/5" />
-						<div className="absolute inset-8 rounded-full border border-white/5" />
-						<div className="absolute inset-12 rounded-full border border-white/5" />
-						<div className="absolute inset-16 rounded-full border border-white/5" />
-
-						{/* Center label */}
-						<div
-							className={cn(
-								"w-16 h-16 rounded-full",
-								"bg-gradient-to-br from-[#3d3a4e] to-[#2d2a3e]",
-								"flex items-center justify-center",
-								"text-muted-foreground/40 text-2xl",
-							)}
-						>
-							♪
-						</div>
-					</div>
+			<div className="flex items-center gap-4">
+				{/* Small vinyl icon */}
+				<div
+					className={cn(
+						"w-12 h-12 rounded-full",
+						"bg-[var(--lofi-vinyl)] border border-border",
+						"flex items-center justify-center",
+						"opacity-40",
+					)}
+				>
+					<div className="w-4 h-4 rounded-full bg-card/50" />
 				</div>
 
-				{/* Connect button */}
 				<button
 					type="button"
 					onClick={login}
 					disabled={authLoading}
 					className={cn(
-						"px-6 py-2.5 rounded-2xl font-medium tracking-wide transition-all duration-300",
-						"bg-[#1DB954]/20 text-[#1DB954] border border-[#1DB954]/30",
-						"hover:bg-[#1DB954]/30 hover:scale-105",
-						"active:scale-95",
+						"px-5 py-2 rounded-xl text-sm transition-all duration-300",
+						"bg-[#1DB954]/10 text-[#1DB954] border border-[#1DB954]/20",
+						"hover:bg-[#1DB954]/20 hover:scale-105",
 						"disabled:opacity-50 disabled:cursor-not-allowed",
 					)}
 				>
 					{authLoading ? "connecting..." : "connect spotify"}
 				</button>
-
-				<p className="text-muted-foreground/40 text-xs text-center max-w-[200px]">
-					play your favorite lofi beats while you focus
-				</p>
 			</div>
 		);
 	}
 
-	// Authenticated state
+	// Authenticated state - horizontal layout
 	return (
-		<div className="flex flex-col items-center gap-6 relative">
-			{/* Vinyl record with album art */}
+		<div className="flex items-center gap-6 relative">
+			{/* Vinyl record with album art - smaller */}
 			<button
 				type="button"
 				onClick={handlePlayPause}
@@ -118,33 +93,29 @@ export function VinylPlayer() {
 				className={cn(
 					"relative group cursor-pointer",
 					"transition-transform duration-300 hover:scale-105",
-					!selectedPlaylist && "opacity-60 cursor-default hover:scale-100",
+					!selectedPlaylist && "opacity-50 cursor-default hover:scale-100",
 				)}
 			>
 				<div
 					className={cn(
-						"w-48 h-48 rounded-full",
-						"bg-gradient-to-br from-[#2d2a3e] to-[#1a1820]",
-						"border border-white/10",
-						"shadow-xl",
+						"w-20 h-20 rounded-full",
+						"bg-[var(--lofi-vinyl)] border border-border",
+						"shadow-lg",
 						isPlaying && "animate-spin-slow",
 						!isPlaying && selectedPlaylist && "animate-spin-slow paused",
 					)}
 				>
 					{/* Vinyl grooves */}
-					<div className="absolute inset-2 rounded-full border border-white/5" />
-					<div className="absolute inset-4 rounded-full border border-white/[0.03]" />
-					<div className="absolute inset-6 rounded-full border border-white/5" />
-					<div className="absolute inset-8 rounded-full border border-white/[0.03]" />
-					<div className="absolute inset-10 rounded-full border border-white/5" />
+					<div className="absolute inset-1 rounded-full border border-[var(--lofi-vinyl-groove)]" />
+					<div className="absolute inset-2 rounded-full border border-[var(--lofi-vinyl-groove)]" />
+					<div className="absolute inset-3 rounded-full border border-[var(--lofi-vinyl-groove)]" />
 
 					{/* Center - Album art or placeholder */}
 					<div
 						className={cn(
-							"absolute inset-[60px] rounded-full overflow-hidden",
-							"bg-gradient-to-br from-[#3d3a4e] to-[#2d2a3e]",
+							"absolute inset-[22px] rounded-full overflow-hidden",
+							"bg-card border border-border",
 							"flex items-center justify-center",
-							"border border-white/10",
 						)}
 					>
 						{selectedPlaylist?.images[0] ? (
@@ -154,7 +125,7 @@ export function VinylPlayer() {
 								className="w-full h-full object-cover"
 							/>
 						) : (
-							<span className="text-muted-foreground/40 text-xl">♪</span>
+							<span className="text-muted-foreground/40 text-sm">♪</span>
 						)}
 					</div>
 
@@ -168,7 +139,7 @@ export function VinylPlayer() {
 						>
 							<span
 								className={cn(
-									"text-white/0 group-hover:text-white/80 text-3xl transition-all duration-300",
+									"text-white/0 group-hover:text-white/80 text-lg transition-all duration-300",
 									"transform scale-50 group-hover:scale-100",
 								)}
 							>
@@ -177,57 +148,67 @@ export function VinylPlayer() {
 						</div>
 					)}
 				</div>
-
-				{/* Spindle hole effect */}
-				<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-					<div className="w-2 h-2 rounded-full bg-[#1a1820] border border-white/10" />
-				</div>
 			</button>
 
-			{/* Current playlist info */}
-			{selectedPlaylist && (
-				<div className="text-center">
-					<div className="text-sm text-foreground/80 font-medium truncate max-w-[200px]">
-						{selectedPlaylist.name}
+			{/* Current playlist info + controls */}
+			<div className="flex flex-col gap-2">
+				{selectedPlaylist ? (
+					<div className="text-sm">
+						<div className="text-foreground/80 font-medium truncate max-w-[180px]">
+							{selectedPlaylist.name}
+						</div>
+						<div className="text-muted-foreground/50 text-xs">
+							{selectedPlaylist.tracksTotal} tracks
+						</div>
 					</div>
-					<div className="text-xs text-muted-foreground/50">
-						{selectedPlaylist.tracksTotal} tracks
+				) : (
+					<div className="text-sm text-muted-foreground/50">
+						no playlist selected
 					</div>
-				</div>
-			)}
+				)}
 
-			{/* Playlist selector toggle */}
+				{/* Playlist selector toggle */}
+				<button
+					type="button"
+					onClick={() => setShowPlaylists(!showPlaylists)}
+					className={cn(
+						"px-3 py-1.5 rounded-lg text-xs transition-all duration-300",
+						"bg-secondary/50 text-muted-foreground border border-border",
+						"hover:bg-secondary hover:text-foreground",
+						showPlaylists && "bg-secondary text-foreground",
+					)}
+				>
+					{showPlaylists ? "hide" : "playlists"}
+				</button>
+			</div>
+
+			{/* Disconnect link */}
 			<button
 				type="button"
-				onClick={() => setShowPlaylists(!showPlaylists)}
-				className={cn(
-					"px-4 py-2 rounded-xl text-sm transition-all duration-300",
-					"bg-white/5 text-muted-foreground border border-white/10",
-					"hover:bg-white/10 hover:text-foreground",
-					showPlaylists && "bg-white/10 text-foreground",
-				)}
+				onClick={logout}
+				className="text-xs text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
 			>
-				{showPlaylists ? "hide playlists" : "choose playlist"}
+				disconnect
 			</button>
 
 			{/* Playlist dropdown */}
 			{showPlaylists && (
 				<div
 					className={cn(
-						"absolute top-full mt-4 w-72",
+						"absolute bottom-full mb-4 left-0 w-80",
 						"bg-card/95 backdrop-blur-lg rounded-2xl",
-						"border border-white/10",
-						"shadow-2xl shadow-black/50",
+						"border border-border",
+						"shadow-2xl",
 						"overflow-hidden z-50",
 					)}
 				>
-					<div className="p-3 border-b border-white/10">
+					<div className="p-3 border-b border-border">
 						<span className="text-xs text-muted-foreground/60 uppercase tracking-wider">
 							your playlists
 						</span>
 					</div>
 
-					<div className="max-h-80 overflow-y-auto">
+					<div className="max-h-64 overflow-y-auto">
 						{playlistsLoading ? (
 							<div className="p-6 text-center text-muted-foreground/50 text-sm">
 								loading playlists...
@@ -244,8 +225,8 @@ export function VinylPlayer() {
 									onClick={() => handlePlaylistSelect(playlist)}
 									className={cn(
 										"w-full flex items-center gap-3 p-3 text-left",
-										"hover:bg-white/5 transition-colors duration-200",
-										selectedPlaylist?.id === playlist.id && "bg-[#d4a5a5]/10",
+										"hover:bg-secondary/50 transition-colors duration-200",
+										selectedPlaylist?.id === playlist.id && "bg-primary/10",
 									)}
 								>
 									{playlist.images[0] ? (
@@ -255,7 +236,7 @@ export function VinylPlayer() {
 											className="w-10 h-10 rounded-lg object-cover"
 										/>
 									) : (
-										<div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground/30">
+										<div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground/30">
 											♪
 										</div>
 									)}
@@ -273,15 +254,6 @@ export function VinylPlayer() {
 					</div>
 				</div>
 			)}
-
-			{/* Disconnect link */}
-			<button
-				type="button"
-				onClick={logout}
-				className="text-xs text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors mt-2"
-			>
-				disconnect spotify
-			</button>
 		</div>
 	);
 }

@@ -44,22 +44,64 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
-  /* Lofi color palette */
-  --color-lofi-cream: #f5f0e8;
-  --color-lofi-warm: #e8ddd4;
-  --color-lofi-pink: #d4a5a5;
-  --color-lofi-purple: #9b8aa5;
-  --color-lofi-sage: #a5b5a0;
-  --color-lofi-night: #2d2a3e;
-  --color-lofi-soft-black: #1a1820;
-  --color-lofi-glow: #ffb86c;
-  --color-lofi-focus: #8fbfa0;
-  --color-lofi-break: #b5a0c4;
 }
 
+/* ============================================
+   LIGHT MODE - Warm paper/cream aesthetic
+   ============================================ */
 :root {
   --radius: 1rem;
+
+  /* Light mode - warm, paper-like, cozy morning coffee vibes */
+  --background: #f8f5f0;
+  --foreground: #3d3a4e;
+  --card: #ffffff;
+  --card-foreground: #3d3a4e;
+  --popover: #ffffff;
+  --popover-foreground: #3d3a4e;
+  --primary: #c4908a;
+  --primary-foreground: #ffffff;
+  --secondary: #ebe6df;
+  --secondary-foreground: #3d3a4e;
+  --muted: #ebe6df;
+  --muted-foreground: #7a7586;
+  --accent: #a89bb0;
+  --accent-foreground: #3d3a4e;
+  --destructive: #d4726a;
+  --border: rgba(61, 58, 78, 0.1);
+  --input: rgba(61, 58, 78, 0.08);
+  --ring: #c4908a;
+  --chart-1: #c4908a;
+  --chart-2: #a89bb0;
+  --chart-3: #9ab5a0;
+  --chart-4: #e8b86d;
+  --chart-5: #7fa990;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #3d3a4e;
+  --sidebar-primary: #c4908a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ebe6df;
+  --sidebar-accent-foreground: #3d3a4e;
+  --sidebar-border: rgba(61, 58, 78, 0.1);
+  --sidebar-ring: #c4908a;
+
+  /* Lofi colors - light mode variants */
+  --lofi-focus: #7fa990;
+  --lofi-focus-bg: rgba(127, 169, 144, 0.15);
+  --lofi-break: #a89bb0;
+  --lofi-break-bg: rgba(168, 155, 176, 0.15);
+  --lofi-overtime: #e8a655;
+  --lofi-overtime-bg: rgba(232, 166, 85, 0.15);
+  --lofi-idle: #c4908a;
+  --lofi-idle-bg: rgba(196, 144, 138, 0.1);
+  --lofi-vinyl: #3d3a4e;
+  --lofi-vinyl-groove: rgba(61, 58, 78, 0.1);
+}
+
+/* ============================================
+   DARK MODE - Cozy night study session
+   ============================================ */
+.dark {
   --background: #1a1820;
   --foreground: #f5f0e8;
   --card: #2d2a3e;
@@ -91,6 +133,18 @@
   --sidebar-accent-foreground: #f5f0e8;
   --sidebar-border: rgba(245, 240, 232, 0.1);
   --sidebar-ring: #d4a5a5;
+
+  /* Lofi colors - dark mode variants */
+  --lofi-focus: #8fbfa0;
+  --lofi-focus-bg: rgba(143, 191, 160, 0.2);
+  --lofi-break: #b5a0c4;
+  --lofi-break-bg: rgba(181, 160, 196, 0.2);
+  --lofi-overtime: #ffb86c;
+  --lofi-overtime-bg: rgba(255, 184, 108, 0.2);
+  --lofi-idle: #d4a5a5;
+  --lofi-idle-bg: rgba(212, 165, 165, 0.1);
+  --lofi-vinyl: #1a1820;
+  --lofi-vinyl-groove: rgba(255, 255, 255, 0.05);
 }
 
 @layer base {
@@ -104,12 +158,26 @@
 
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Light mode background */
+  body {
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(168, 155, 176, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(196, 144, 138, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(159, 181, 160, 0.06) 0%, transparent 70%),
+      #f8f5f0;
+  }
+
+  /* Dark mode background */
+  .dark body {
     background:
       radial-gradient(ellipse at 20% 80%, rgba(155, 138, 165, 0.15) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, rgba(212, 165, 165, 0.1) 0%, transparent 50%),
       radial-gradient(ellipse at 50% 50%, rgba(143, 191, 160, 0.05) 0%, transparent 70%),
       #1a1820;
-    min-height: 100vh;
   }
 }
 
@@ -127,38 +195,71 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.03;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   z-index: 9999;
 }
 
-/* Soft glow effects */
+.dark .noise-overlay {
+  opacity: 0.03;
+}
+
+/* Soft glow effects - Light mode */
 .glow-focus {
   box-shadow:
-    0 0 30px rgba(143, 191, 160, 0.3),
-    0 0 60px rgba(143, 191, 160, 0.15),
-    inset 0 0 30px rgba(143, 191, 160, 0.05);
+    0 0 40px rgba(127, 169, 144, 0.25),
+    0 0 80px rgba(127, 169, 144, 0.1),
+    inset 0 0 40px rgba(127, 169, 144, 0.03);
 }
 
 .glow-break {
   box-shadow:
-    0 0 30px rgba(181, 160, 196, 0.3),
-    0 0 60px rgba(181, 160, 196, 0.15),
-    inset 0 0 30px rgba(181, 160, 196, 0.05);
+    0 0 40px rgba(168, 155, 176, 0.25),
+    0 0 80px rgba(168, 155, 176, 0.1),
+    inset 0 0 40px rgba(168, 155, 176, 0.03);
 }
 
 .glow-overtime {
   box-shadow:
-    0 0 30px rgba(255, 184, 108, 0.4),
-    0 0 60px rgba(255, 184, 108, 0.2),
-    inset 0 0 30px rgba(255, 184, 108, 0.05);
+    0 0 40px rgba(232, 166, 85, 0.3),
+    0 0 80px rgba(232, 166, 85, 0.15),
+    inset 0 0 40px rgba(232, 166, 85, 0.03);
 }
 
 .glow-idle {
   box-shadow:
-    0 0 20px rgba(212, 165, 165, 0.2),
-    0 0 40px rgba(212, 165, 165, 0.1),
-    inset 0 0 20px rgba(212, 165, 165, 0.03);
+    0 0 30px rgba(196, 144, 138, 0.15),
+    0 0 60px rgba(196, 144, 138, 0.08),
+    inset 0 0 30px rgba(196, 144, 138, 0.02);
+}
+
+/* Dark mode glow effects */
+.dark .glow-focus {
+  box-shadow:
+    0 0 50px rgba(143, 191, 160, 0.3),
+    0 0 100px rgba(143, 191, 160, 0.15),
+    inset 0 0 50px rgba(143, 191, 160, 0.05);
+}
+
+.dark .glow-break {
+  box-shadow:
+    0 0 50px rgba(181, 160, 196, 0.3),
+    0 0 100px rgba(181, 160, 196, 0.15),
+    inset 0 0 50px rgba(181, 160, 196, 0.05);
+}
+
+.dark .glow-overtime {
+  box-shadow:
+    0 0 50px rgba(255, 184, 108, 0.4),
+    0 0 100px rgba(255, 184, 108, 0.2),
+    inset 0 0 50px rgba(255, 184, 108, 0.05);
+}
+
+.dark .glow-idle {
+  box-shadow:
+    0 0 30px rgba(212, 165, 165, 0.2),
+    0 0 60px rgba(212, 165, 165, 0.1),
+    inset 0 0 30px rgba(212, 165, 165, 0.03);
 }
 
 /* Vinyl record animation */
@@ -212,6 +313,17 @@
   transition: all 0.15s ease-out;
 }
 
+/* Theme toggle animation */
+@keyframes theme-switch {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(0.9) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+
+.theme-switch-animate {
+  animation: theme-switch 0.5s ease-in-out;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
@@ -222,12 +334,13 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 165, 165, 0.3);
+  background: var(--primary);
+  opacity: 0.3;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 165, 165, 0.5);
+  opacity: 0.5;
 }
 
 /* Focus ring styling */
@@ -238,6 +351,17 @@
 
 /* Selection styling */
 ::selection {
-  background: rgba(212, 165, 165, 0.3);
-  color: #f5f0e8;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  opacity: 0.3;
+}
+
+/* Responsive timer sizing */
+.timer-display {
+  font-size: clamp(6rem, 15vw, 14rem);
+  line-height: 1;
+}
+
+.timer-display-input {
+  font-size: clamp(6rem, 15vw, 14rem);
 }

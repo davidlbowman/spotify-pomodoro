@@ -77,27 +77,43 @@ export function LofiTimer() {
 				? "glow-break"
 				: "glow-idle";
 
-	// Color for the timer text
-	const textColorClass = isOvertime
-		? "text-[#ffb86c]"
+	// Color classes using CSS variables
+	const colorClass = isOvertime
+		? "text-[var(--lofi-overtime)]"
 		: phase === "focus"
-			? "text-[#8fbfa0]"
+			? "text-[var(--lofi-focus)]"
 			: phase === "break"
-				? "text-[#b5a0c4]"
-				: "text-[#d4a5a5]";
+				? "text-[var(--lofi-break)]"
+				: "text-[var(--lofi-idle)]";
+
+	const bgColorClass = isOvertime
+		? "bg-[var(--lofi-overtime-bg)]"
+		: phase === "focus"
+			? "bg-[var(--lofi-focus-bg)]"
+			: phase === "break"
+				? "bg-[var(--lofi-break-bg)]"
+				: "bg-[var(--lofi-idle-bg)]";
+
+	const borderColorClass = isOvertime
+		? "border-[var(--lofi-overtime)]"
+		: phase === "focus"
+			? "border-[var(--lofi-focus)]"
+			: phase === "break"
+				? "border-[var(--lofi-break)]"
+				: "border-[var(--lofi-idle)]";
 
 	if (!state) {
 		return (
 			<div className="flex flex-col items-center">
 				<div
 					className={cn(
-						"w-[420px] h-[240px] rounded-3xl bg-card/80 backdrop-blur-sm",
+						"px-16 py-12 rounded-3xl bg-card/80 backdrop-blur-sm",
 						"flex items-center justify-center",
 						"glow-idle",
 					)}
 				>
-					<span className="text-muted-foreground animate-pulse-soft">
-						loading...
+					<span className="text-muted-foreground animate-pulse-soft timer-display">
+						--:--
 					</span>
 				</div>
 			</div>
@@ -105,7 +121,7 @@ export function LofiTimer() {
 	}
 
 	return (
-		<div className="flex flex-col items-center gap-8">
+		<div className="flex flex-col items-center gap-10">
 			{/* Phase indicator */}
 			<div className="flex items-center gap-4">
 				<button
@@ -113,34 +129,37 @@ export function LofiTimer() {
 					onClick={() => phase !== "idle" && switchPhase()}
 					disabled={phase === "idle"}
 					className={cn(
-						"px-4 py-1.5 rounded-full text-sm tracking-widest uppercase transition-all duration-300",
-						phase === "focus" && "bg-[#8fbfa0]/20 text-[#8fbfa0]",
-						phase === "break" && "bg-[#b5a0c4]/20 text-[#b5a0c4]",
-						phase === "idle" && "bg-[#d4a5a5]/10 text-[#d4a5a5]/60",
+						"px-5 py-2 rounded-full text-sm tracking-widest uppercase transition-all duration-300",
+						bgColorClass,
+						colorClass,
 						phase !== "idle" && "hover:scale-105 cursor-pointer",
+						phase === "idle" && "opacity-60",
 					)}
 				>
 					{phase === "idle" ? "ready" : phase}
 				</button>
 
 				{state.sessionCount > 0 && (
-					<span className="text-muted-foreground/60 text-sm">
+					<span className="text-muted-foreground/60 text-sm tracking-wide">
 						session {state.sessionCount}
 					</span>
 				)}
 			</div>
 
-			{/* Main timer display */}
+			{/* Main timer display - MUCH LARGER */}
 			<div
 				className={cn(
-					"relative px-12 py-10 rounded-3xl bg-card/60 backdrop-blur-sm",
-					"border border-white/5",
+					"relative px-16 lg:px-24 py-12 lg:py-16 rounded-[2rem] bg-card/60 backdrop-blur-sm",
+					"border border-border/50",
 					"transition-all duration-500",
 					glowClass,
 				)}
 			>
 				<div
-					className={cn("font-digital text-8xl tracking-tight", textColorClass)}
+					className={cn(
+						"font-digital timer-display tracking-tight",
+						colorClass,
+					)}
 				>
 					{/* Overtime sign */}
 					{sign && <span className="animate-pulse-soft">{sign}</span>}
@@ -157,10 +176,11 @@ export function LofiTimer() {
 							onBlur={handleEditSubmit}
 							onKeyDown={handleKeyDown}
 							className={cn(
-								"w-[120px] bg-transparent border-b-2 border-current",
-								"text-center outline-none font-digital text-8xl",
+								"w-[1.5em] bg-transparent border-b-4",
+								borderColorClass,
+								"text-center outline-none font-digital timer-display-input",
 								"appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-								textColorClass,
+								colorClass,
 							)}
 						/>
 					) : isStopped || phase === "idle" ? (
@@ -168,58 +188,63 @@ export function LofiTimer() {
 							type="button"
 							onClick={handleMinutesClick}
 							className={cn(
-								"digit-transition inline-block min-w-[120px] text-center",
+								"digit-transition inline-block w-[1.5em] text-center",
 								"cursor-pointer hover:opacity-70 transition-opacity",
-								"bg-transparent border-none p-0 font-digital text-8xl",
-								textColorClass,
+								"bg-transparent border-none p-0 font-digital timer-display",
+								colorClass,
 							)}
 							title="Click to edit duration"
 						>
 							{minutes}
 						</button>
 					) : (
-						<span className="digit-transition inline-block min-w-[120px] text-center">
+						<span className="digit-transition inline-block w-[1.5em] text-center">
 							{minutes}
 						</span>
 					)}
 
 					{/* Colon */}
-					<span className={cn("mx-1", isRunning && "animate-blink-colon")}>
+					<span className={cn("mx-2", isRunning && "animate-blink-colon")}>
 						:
 					</span>
 
 					{/* Seconds */}
-					<span className="digit-transition inline-block min-w-[120px] text-center">
+					<span className="digit-transition inline-block w-[1.5em] text-center">
 						{seconds}
 					</span>
 				</div>
 
 				{/* Edit hint */}
 				{(isStopped || phase === "idle") && !isEditingMinutes && (
-					<div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-muted-foreground/40">
+					<div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-muted-foreground/40 whitespace-nowrap">
 						click minutes to edit
 					</div>
 				)}
 
 				{/* Overtime indicator */}
 				{isOvertime && (
-					<div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#ffb86c]/20 text-[#ffb86c] text-xs tracking-wider uppercase">
+					<div
+						className={cn(
+							"absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs tracking-wider uppercase",
+							"bg-[var(--lofi-overtime-bg)] text-[var(--lofi-overtime)]",
+						)}
+					>
 						overtime
 					</div>
 				)}
 			</div>
 
 			{/* Controls */}
-			<div className="flex items-center gap-4 mt-2">
+			<div className="flex items-center gap-4 mt-4">
 				{/* Start/Resume button */}
 				{!isRunning && (
 					<button
 						type="button"
 						onClick={start}
 						className={cn(
-							"px-8 py-3 rounded-2xl font-medium tracking-wide transition-all duration-300",
-							"bg-[#d4a5a5]/20 text-[#d4a5a5] border border-[#d4a5a5]/30",
-							"hover:bg-[#d4a5a5]/30 hover:scale-105",
+							"px-10 py-4 rounded-2xl font-medium tracking-wide text-lg transition-all duration-300",
+							"bg-[var(--lofi-idle-bg)] text-[var(--lofi-idle)] border border-[var(--lofi-idle)]/30",
+							"hover:bg-[var(--lofi-idle)]/20 hover:scale-105",
 							"active:scale-95",
 						)}
 					>
@@ -233,8 +258,8 @@ export function LofiTimer() {
 						type="button"
 						onClick={pause}
 						className={cn(
-							"px-8 py-3 rounded-2xl font-medium tracking-wide transition-all duration-300",
-							"bg-secondary/50 text-foreground/80 border border-white/10",
+							"px-10 py-4 rounded-2xl font-medium tracking-wide text-lg transition-all duration-300",
+							"bg-secondary/50 text-foreground/80 border border-border",
 							"hover:bg-secondary/70 hover:scale-105",
 							"active:scale-95",
 						)}
@@ -249,9 +274,9 @@ export function LofiTimer() {
 						type="button"
 						onClick={reset}
 						className={cn(
-							"px-6 py-3 rounded-2xl font-medium tracking-wide transition-all duration-300",
-							"bg-transparent text-muted-foreground border border-white/10",
-							"hover:bg-white/5 hover:scale-105",
+							"px-8 py-4 rounded-2xl font-medium tracking-wide text-lg transition-all duration-300",
+							"bg-transparent text-muted-foreground border border-border",
+							"hover:bg-secondary/30 hover:scale-105",
 							"active:scale-95",
 						)}
 					>
@@ -265,10 +290,10 @@ export function LofiTimer() {
 						type="button"
 						onClick={switchPhase}
 						className={cn(
-							"px-6 py-3 rounded-2xl font-medium tracking-wide transition-all duration-300",
+							"px-8 py-4 rounded-2xl font-medium tracking-wide text-lg transition-all duration-300",
 							phase === "focus"
-								? "bg-[#b5a0c4]/20 text-[#b5a0c4] border border-[#b5a0c4]/30"
-								: "bg-[#8fbfa0]/20 text-[#8fbfa0] border border-[#8fbfa0]/30",
+								? "bg-[var(--lofi-break-bg)] text-[var(--lofi-break)] border border-[var(--lofi-break)]/30"
+								: "bg-[var(--lofi-focus-bg)] text-[var(--lofi-focus)] border border-[var(--lofi-focus)]/30",
 							"hover:scale-105",
 							"active:scale-95",
 						)}
@@ -280,8 +305,8 @@ export function LofiTimer() {
 
 			{/* Duration presets when stopped */}
 			{(isStopped || phase === "idle") && (
-				<div className="flex items-center gap-2 mt-2">
-					<span className="text-muted-foreground/40 text-xs mr-2">
+				<div className="flex items-center gap-3 mt-2">
+					<span className="text-muted-foreground/40 text-sm mr-2">
 						presets:
 					</span>
 					{[15, 25, 45, 60].map((mins) => (
@@ -302,10 +327,10 @@ export function LofiTimer() {
 								}
 							}}
 							className={cn(
-								"px-3 py-1 rounded-lg text-xs transition-all duration-200",
+								"px-4 py-2 rounded-xl text-sm transition-all duration-200",
 								configuredMinutes === mins
-									? "bg-[#d4a5a5]/30 text-[#d4a5a5]"
-									: "bg-white/5 text-muted-foreground/60 hover:bg-white/10 hover:text-muted-foreground",
+									? cn(bgColorClass, colorClass)
+									: "bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground",
 							)}
 						>
 							{mins}m
