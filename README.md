@@ -34,7 +34,7 @@ bun install
 3. Fill in the details:
    - **App name:** Spotify Pomodoro (or whatever you prefer)
    - **App description:** Pomodoro timer with Spotify
-   - **Redirect URI:** `http://localhost:4321/callback`
+   - **Redirect URI:** `http://127.0.0.1:4321/callback`
    - **APIs used:** Check "Web API"
 4. Click "Save"
 5. In your app's settings, copy the **Client ID**
@@ -45,7 +45,7 @@ Create a `.env` file in the project root:
 
 ```bash
 PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
-PUBLIC_SPOTIFY_REDIRECT_URI=http://localhost:4321/callback
+PUBLIC_SPOTIFY_REDIRECT_URI=http://127.0.0.1:4321/callback
 ```
 
 Replace `your_client_id_here` with the Client ID from step 2.

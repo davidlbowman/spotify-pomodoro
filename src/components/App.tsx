@@ -40,6 +40,7 @@ export function App() {
 		null,
 	);
 	const [showPlaylists, setShowPlaylists] = useState(false);
+	const [isPlayingIntent, setIsPlayingIntent] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +67,12 @@ export function App() {
 			fetchPlaylists();
 		}
 	}, [isAuthenticated, fetchPlaylists]);
+
+	useEffect(() => {
+		if (playbackState) {
+			setIsPlayingIntent(playbackState.isPlaying);
+		}
+	}, [playbackState]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -144,15 +151,18 @@ export function App() {
 	const handlePlaylistSelect = async (playlist: Playlist) => {
 		setSelectedPlaylist(playlist);
 		setShowPlaylists(false);
+		setIsPlayingIntent(true);
 		await play({ contextUri: playlist.uri });
 		await setShuffle(true);
 		await setRepeat("context");
 	};
 
 	const handlePlayPause = async () => {
-		if (isPlaying) {
+		if (isPlaying || isPlayingIntent) {
+			setIsPlayingIntent(false);
 			await pauseMusic();
 		} else if (selectedPlaylist) {
+			setIsPlayingIntent(true);
 			await play({ contextUri: selectedPlaylist.uri });
 		}
 	};
@@ -329,8 +339,9 @@ export function App() {
 									<div
 										className={cn(
 											"w-[4.5rem] h-[4.5rem] rounded-full bg-[var(--lofi-vinyl)] border border-border",
-											isPlaying && "animate-spin-slow",
+											(isPlaying || isPlayingIntent) && "animate-spin-slow",
 											!isPlaying &&
+												!isPlayingIntent &&
 												selectedPlaylist &&
 												"animate-spin-slow paused",
 										)}
