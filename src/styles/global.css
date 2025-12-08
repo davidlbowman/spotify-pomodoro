@@ -1,11 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 /* Lofi Pomodoro - Refined minimal timer */
 
 @custom-variant dark (&:is(.dark *));
-
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
