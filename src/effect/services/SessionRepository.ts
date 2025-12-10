@@ -3,9 +3,9 @@
  *
  * @module
  */
-import Database from "better-sqlite3";
+import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/libsql";
 import { Effect } from "effect";
 import { breakSessions, focusSessions, pomodoros } from "../../db/schema";
 import {
@@ -31,8 +31,8 @@ import type {
  * @category Database
  */
 const getDb = () => {
-	const sqlite = new Database("./data/pomodoro.db");
-	return drizzle(sqlite);
+	const client = createClient({ url: "file:./data/pomodoro.db" });
+	return drizzle(client);
 };
 
 /**

@@ -14,6 +14,7 @@ import {
 import { useTheme } from "../hooks/useTheme";
 import { useTimer } from "../hooks/useTimer";
 import { cn } from "../lib/utils";
+import { PresetSelector } from "./PresetSelector";
 import { StatsDialog } from "./StatsDialog";
 
 /**
@@ -179,6 +180,7 @@ export function App() {
 
 			<main className="flex-1 flex flex-col items-center justify-center px-6">
 				<div className="flex flex-col items-center gap-6">
+					<PresetSelector />
 					<div
 						className={cn(
 							"relative px-10 py-8 rounded-2xl bg-card/40 backdrop-blur-sm",
@@ -224,8 +226,8 @@ export function App() {
 					<span className="text-muted-foreground/40 text-xs tracking-wide">
 						{isRunning
 							? isOvertime
-								? `press s to skip to ${phase === "focus" ? "break" : "focus"}`
-								: `press e to end your ${phase}`
+								? `press s to begin ${phase === "focus" ? "break" : "focus"}`
+								: `press e to end your ${phase} early`
 							: phase === "idle"
 								? "press space to start"
 								: "press space to resume · r to reset"}

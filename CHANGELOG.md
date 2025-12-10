@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-10
+
+### Added
+
+- Timer presets: Short (15/3), Classic (25/5), Long (50/10)
+- Docker Compose deployment for self-hosting
+- Health check endpoint (`/api/health`) for container monitoring
+- Coolify-compatible deployment
+- Server-side OAuth PKCE flow for HTTP compatibility on local networks
+- Astro sessions for secure PKCE state management
+- PR template with CONTRIBUTING.md checklist
+
+### Changed
+
+- README rewritten for Docker-first deployment with local/HTTPS setup options
+- Removed custom timer configuration (replaced with presets)
+- Improved timer hint text clarity ("end early", "begin" instead of "skip")
+- Switched from better-sqlite3 to libsql for cross-runtime compatibility
+
+### Fixed
+
+- DialogContent accessibility warning (added aria-describedby)
+- OAuth flow works on HTTP for localhost/127.0.0.1 (Spotify requirement)
+
+### Technical
+
+- Multi-stage Dockerfile with `oven/bun:1-slim` base
+- Production and development compose files
+- SQLite persistence via Docker volume
+- Server-side PKCE using Node crypto (bypasses browser secure context requirement)
+- libsql client for Bun runtime compatibility
+
 ## [0.2.0] - 2025-12-10
 
 ### Added
@@ -78,6 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Spotify Web API integration for playback control
 - JSDoc documentation throughout codebase
 
+[1.0.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.0.2...0.1.0
 [0.0.2]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.0.1...0.0.2

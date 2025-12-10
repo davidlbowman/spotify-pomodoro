@@ -22,6 +22,19 @@ export function useSpotifyAuth() {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const tokenParam = params.get("token");
+
+		if (tokenParam) {
+			try {
+				const token = JSON.parse(decodeURIComponent(tokenParam));
+				localStorage.setItem("spotify_token", JSON.stringify(token));
+				window.history.replaceState({}, "", "/");
+			} catch {
+				console.error("Failed to parse token from URL");
+			}
+		}
+
 		runEffect(SpotifyAuth.restoreToken)
 			.then((maybeToken) => {
 				setIsAuthenticated(Option.isSome(maybeToken));
@@ -31,13 +44,9 @@ export function useSpotifyAuth() {
 	}, []);
 
 	const login = useCallback(async () => {
-		const url = await runEffect(SpotifyAuth.getAuthUrl);
-		window.location.href = url;
-	}, []);
-
-	const handleCallback = useCallback(async (code: string, state: string) => {
-		await runEffect(SpotifyAuth.exchangeCode(code, state));
-		setIsAuthenticated(true);
+		const response = await fetch("/api/auth/init");
+		const { authUrl } = await response.json();
+		window.location.href = authUrl;
 	}, []);
 
 	const logout = useCallback(async () => {
@@ -49,7 +58,6 @@ export function useSpotifyAuth() {
 		isAuthenticated,
 		isLoading,
 		login,
-		handleCallback,
 		logout,
 	};
 }

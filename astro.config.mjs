@@ -9,6 +9,9 @@ export default defineConfig({
 	adapter: node({
 		mode: "standalone",
 	}),
+	session: {
+		driver: "fs",
+	},
 	server: {
 		port: 2500,
 	},

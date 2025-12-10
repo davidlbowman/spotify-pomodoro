@@ -37,6 +37,7 @@ export function StatsDialog({ children }: StatsDialogProps) {
 			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent
 				className={cn("bg-card/95 backdrop-blur-lg border-border", "max-w-md")}
+				aria-describedby={undefined}
 			>
 				<DialogHeader>
 					<DialogTitle className="text-lg font-medium tracking-wide">

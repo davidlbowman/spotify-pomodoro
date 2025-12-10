@@ -40,6 +40,20 @@ bun run dev
 bun run lint:fix && bun run typecheck && bun run test
 ```
 
+### Docker Development
+
+You can also develop using Docker:
+
+```bash
+# Start dev server with hot reload
+docker compose -f docker-compose.dev.yml up
+
+# Rebuild after dependency changes
+docker compose -f docker-compose.dev.yml up --build
+```
+
+The dev container mounts your local files, so changes reflect immediately.
+
 ## Code Style
 
 ### Linting & Formatting

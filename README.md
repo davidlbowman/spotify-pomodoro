@@ -1,69 +1,81 @@
 # Spotify Pomodoro
 
-A lofi-styled pomodoro timer with Spotify integration and session tracking. Focus on your work while your favorite playlists play in the background.
+A self-hosted pomodoro timer with Spotify integration and a lofi aesthetic. Focus on your work while your favorite playlists play in the background.
 
 ## Features
 
-- 25-minute focus / 5-minute break pomodoro timer
+- Timer presets: Short (15/3), Classic (25/5), Long (50/10)
 - Overtime mode - timer counts up after completion, you decide when to switch
 - Session statistics - track your focus time, streaks, and overtime
 - Spotify integration with playlist selection
-- Auto-shuffle and repeat for continuous music
 - Light/dark theme toggle
 - Keyboard-first controls
-- Audio notification when timer ends
 
-## Quick Start
+## Quick Start with Docker
 
-### Prerequisites
-
-- [Bun](https://bun.sh/) v1.0+
-- A Spotify Developer account (for music integration)
-
-### 1. Clone and Install
-
-```bash
-git clone https://github.com/davidlbowman/spotify-pomodoro.git
-cd spotify-pomodoro
-bun install
-```
-
-### 2. Initialize the Database
-
-```bash
-bun run db:migrate
-```
-
-This creates the SQLite database at `data/pomodoro.db` for storing your session history.
-
-### 3. Create a Spotify App (Optional)
-
-Skip this step if you don't need Spotify integration.
+### 1. Create a Spotify App
 
 1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
 2. Click "Create App"
 3. Fill in the details:
    - **App name:** Spotify Pomodoro
-   - **Redirect URI:** `https://127.0.0.1:2500/callback`
+   - **Redirect URI:** See setup options below
    - **APIs used:** Check "Web API"
 4. Copy the **Client ID** from your app's settings
 
-### 4. Configure Environment Variables
+### 2. Choose Your Setup
 
-Create a `.env` file in the project root:
+#### Option A: Local Development (HTTP)
+
+Spotify allows HTTP only for `localhost` or `127.0.0.1`. Use this for local testing:
 
 ```bash
+# .env
 PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
-PUBLIC_SPOTIFY_REDIRECT_URI=https://127.0.0.1:2500/callback
+PUBLIC_SPOTIFY_REDIRECT_URI=http://127.0.0.1:2500/callback
 ```
 
-### 5. Start the Development Server
+Add `http://127.0.0.1:2500/callback` to your Spotify app's Redirect URIs.
+
+#### Option B: Production with Custom Domain (HTTPS)
+
+For deployment on a server (Coolify, VPS, etc.), you need HTTPS. Set up a domain with SSL:
 
 ```bash
-bun run dev
+# .env
+PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
+PUBLIC_SPOTIFY_REDIRECT_URI=https://pomodoro.yourdomain.com/callback
 ```
 
-Open [https://localhost:2500](https://localhost:2500) in your browser.
+Add `https://pomodoro.yourdomain.com/callback` to your Spotify app's Redirect URIs.
+
+> **Note:** Spotify requires HTTPS for any redirect URI that isn't `localhost` or `127.0.0.1`. If deploying to a local network IP (e.g., `192.168.x.x`), you must set up SSL via a reverse proxy or use a domain with DNS pointing to your server.
+
+### 3. Run with Docker Compose
+
+```bash
+docker compose up -d
+```
+
+Open your configured URL in a browser.
+
+### Updating
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Your session data persists in the `pomodoro_data` volume.
+
+## Deploy on Coolify
+
+1. Create a new service from this repository
+2. Set environment variables in Coolify's UI:
+   - `PUBLIC_SPOTIFY_CLIENT_ID`
+   - `PUBLIC_SPOTIFY_REDIRECT_URI` (use your Coolify domain: `https://pomodoro.yourdomain.com/callback`)
+3. Update your Spotify app's redirect URI to match
+4. Deploy
 
 ## Keyboard Controls
 
@@ -74,28 +86,32 @@ Open [https://localhost:2500](https://localhost:2500) in your browser.
 | `S`               | Skip to next phase (during overtime)         |
 | `R`               | Reset timer (when stopped)                   |
 
-## Available Scripts
+## Local Development
 
-| Command              | Description                  |
-| -------------------- | ---------------------------- |
-| `bun run dev`        | Start development server     |
-| `bun run build`      | Build for production         |
-| `bun run test`       | Run tests                    |
-| `bun run lint`       | Check for linting issues     |
-| `bun run typecheck`  | Run TypeScript type checking |
-| `bun run db:migrate` | Apply database migrations    |
-| `bun run db:clean`   | Clear all session data       |
-| `bun run db:studio`  | Open database GUI            |
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup.
+
+```bash
+# Without Docker
+bun install
+bun run db:migrate
+bun run dev
+
+# With Docker
+docker compose -f docker-compose.dev.yml up
+```
 
 ## Data Persistence
 
-Session data is stored locally in `data/pomodoro.db` (SQLite). This directory is gitignored.
-
-**Important:** The database is local to your machine. If you delete the `data/` folder or clone fresh, you'll start with an empty database. Future versions will support Docker for easier data persistence across updates.
+Session data is stored in SQLite. When using Docker, data persists in the `pomodoro_data` volume.
 
 To reset your data:
 
 ```bash
+# Docker
+docker compose down -v
+docker compose up -d
+
+# Local
 bun run db:clean
 ```
 
@@ -106,35 +122,20 @@ bun run db:clean
 - **Database:** SQLite with Drizzle ORM
 - **Styling:** Tailwind CSS v4 + shadcn/ui
 - **State Management:** Effect-TS
-- **Testing:** Vitest with @effect/vitest
-- **Linting:** Biome
 
 ## Troubleshooting
 
 ### "Invalid redirect URI"
 
-Make sure the redirect URI in your Spotify app settings exactly matches `PUBLIC_SPOTIFY_REDIRECT_URI` in your `.env` file.
+Ensure the redirect URI in your Spotify app settings exactly matches `PUBLIC_SPOTIFY_REDIRECT_URI` in your environment.
 
 ### "No active device"
 
 Spotify requires an active device to control playback. Open Spotify on your computer or phone before selecting a playlist.
 
-### Timer notification not playing
+### Container health check failing
 
-Browser autoplay policies may block audio. Interact with the page before the timer ends to enable audio.
-
-### Database errors
-
-If you see database errors, try:
-
-```bash
-rm -rf data/
-bun run db:migrate
-```
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
+Check logs with `docker compose logs`. Ensure port 2500 is not in use by another service.
 
 ## License
 
