@@ -8,7 +8,7 @@ Thank you for your interest in contributing! This guide covers the development e
 
 - [Bun](https://bun.sh/) v1.0+
 - A text editor with TypeScript support
-- A Spotify Developer account (for testing)
+- A Spotify Developer account (optional, for music integration)
 
 ### Setup
 
@@ -56,23 +56,22 @@ bun run lint:fix    # Auto-fix issues
 **Use JSDoc only.** No inline comments (`// ...`) or block comments (`/* ... */`).
 
 ```typescript
-// Good
 /**
  * Fetches user playlists from Spotify.
+ *
  * @since 0.0.1
  * @category Services
  */
 const fetchPlaylists = Effect.gen(function* () {
-  // ...
-});
-
-// Bad
-// Fetch playlists from Spotify
-const fetchPlaylists = Effect.gen(function* () {
-  /* implementation */
-  // inline comment
+  const client = yield* SpotifyClient;
+  return yield* client.getPlaylists;
 });
 ```
+
+Required JSDoc tags:
+- `@module` at file level (top of each file)
+- `@since` version tag on all exports
+- `@category` to group related items (Services, Errors, Schemas, Hooks)
 
 ### TypeScript
 
@@ -93,32 +92,30 @@ All services use `Effect.Service` with the following conventions:
 import { Effect } from "effect";
 
 /**
- * Description of the service.
+ * Example service with dependency injection.
+ *
  * @since 0.0.1
  * @category Services
  */
 export class MyService extends Effect.Service<MyService>()("MyService", {
   accessors: true,
   effect: Effect.gen(function* () {
-    // Dependency injection
-    const config = yield* SpotifyConfig;
+    const config = yield* AppConfig;
 
-    // Define methods
     const doSomething = Effect.gen(function* () {
-      // Implementation
+      return config.value;
     });
 
     return { doSomething };
   }),
-  dependencies: [SpotifyConfig.Default],
+  dependencies: [AppConfig.Default],
 }) {}
 ```
 
 Key points:
-
-- Always include `accessors: true` (except for config services using `sync`)
+- Always include `accessors: true` (except config services using `sync`)
 - Include JSDoc with `@since` and `@category` tags
-- Declare dependencies explicitly
+- Declare dependencies explicitly in the `dependencies` array
 
 ### Error Types
 
