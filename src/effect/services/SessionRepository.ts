@@ -3,9 +3,9 @@
  *
  * @module
  */
-import Database from "bun:sqlite";
+import Database from "better-sqlite3";
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/bun-sqlite";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 import { Effect } from "effect";
 import { breakSessions, focusSessions, pomodoros } from "../../db/schema";
 import {
