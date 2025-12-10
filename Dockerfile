@@ -1,13 +1,7 @@
-# Stage 1: Build with Node (better-sqlite3 needs node-gyp)
-FROM node:20-slim AS builder
+# Stage 1: Build
+FROM oven/bun:1-slim AS builder
 
 WORKDIR /app
-
-# Install build dependencies for better-sqlite3
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
-
-# Install bun for the build process
-RUN npm install -g bun
 
 # Install dependencies
 COPY package.json bun.lock* ./
@@ -17,7 +11,7 @@ RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build
 
-# Stage 2: Production with Bun
+# Stage 2: Production
 FROM oven/bun:1-slim AS production
 
 WORKDIR /app
