@@ -118,6 +118,11 @@ Required for Spotify integration:
 - `PUBLIC_SPOTIFY_CLIENT_ID` - Spotify app client ID
 - `PUBLIC_SPOTIFY_REDIRECT_URI` - OAuth callback URL (must be HTTPS except for localhost/127.0.0.1)
 
+Optional for authentication (VPS deployments):
+- `AUTH_ENABLED` - Set to `true` to enable auth (default: false)
+- `AUTH_PASSWORD` - Login password (username is always "admin")
+- `AUTH_SECRET` - Secret for signing cookies (32+ chars recommended)
+
 ## OAuth Architecture
 
 Spotify OAuth uses server-side PKCE flow:

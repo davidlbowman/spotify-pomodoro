@@ -24,7 +24,7 @@ interface LoginProps {
  * @category Components
  */
 export function Login({ returnUrl = "/" }: LoginProps) {
-	const [username, setUsername] = useState("admin");
+	const username = "admin";
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
@@ -115,17 +115,14 @@ export function Login({ returnUrl = "/" }: LoginProps) {
 									id="username"
 									type="text"
 									value={username}
-									onChange={(e) => setUsername(e.target.value)}
-									required
+									readOnly
 									autoComplete="username"
 									className={cn(
 										"w-full px-4 py-3 rounded-xl",
-										"bg-background/50 border border-border/50",
-										"text-foreground placeholder:text-muted-foreground/30",
-										"focus:outline-none focus:ring-2 focus:ring-[var(--lofi-idle)]/30 focus:border-[var(--lofi-idle)]/50",
+										"bg-background/30 border border-border/30",
+										"text-muted-foreground cursor-not-allowed",
 										"transition-all duration-200",
 									)}
-									placeholder="your username"
 								/>
 							</div>
 

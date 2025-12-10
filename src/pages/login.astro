@@ -9,7 +9,7 @@
 import "@/styles/global.css";
 import { Login as LoginForm } from "@/components/Login";
 
-const returnUrl = Astro.url.searchParams.get("return") || "/";
+const _returnUrl = Astro.url.searchParams.get("return") || "/";
 export const prerender = false;
 ---
 
