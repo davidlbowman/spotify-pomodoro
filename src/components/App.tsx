@@ -24,7 +24,7 @@ import { StatsDialog } from "./StatsDialog";
  */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
-	const { state, start, pause, reset, skip, setConfig, setPreset, presets } =
+	const { state, start, reset, skip, setConfig, setPreset, presets } =
 		useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
@@ -48,9 +48,8 @@ export function App() {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const isRunning = state?.status === "running";
-	const isPaused = state?.status === "paused";
 	const isOvertime = state?.isOvertime ?? false;
-	const isStopped = state?.status === "stopped";
+	const isStopped = state?.status === "stopped" || state?.status === "paused";
 	const phase = state?.phase ?? "idle";
 	const isPlaying = playbackState?.isPlaying ?? false;
 
@@ -78,20 +77,25 @@ export function App() {
 		}
 	}, [playbackState]);
 
+	const endEarly = useCallback(() => {
+		skip();
+	}, [skip]);
+
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (isEditingMinutes || e.target instanceof HTMLInputElement) return;
 
 			if (e.code === "Space" || e.code === "Enter") {
 				e.preventDefault();
-				if (isRunning) {
-					pause();
-				} else {
+				if (!isRunning) {
 					start();
 				}
-			} else if (e.code === "KeyR" && (isPaused || isOvertime)) {
+			} else if (e.code === "KeyR" && !isRunning && phase !== "idle") {
 				e.preventDefault();
 				reset();
+			} else if (e.code === "KeyE" && isRunning && !isOvertime) {
+				e.preventDefault();
+				endEarly();
 			} else if (e.code === "KeyS" && isOvertime) {
 				e.preventDefault();
 				skip();
@@ -102,13 +106,13 @@ export function App() {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [
 		isRunning,
-		isPaused,
 		isOvertime,
 		isEditingMinutes,
 		start,
-		pause,
 		reset,
 		skip,
+		endEarly,
+		phase,
 	]);
 
 	const handleMinutesClick = useCallback(() => {
@@ -320,11 +324,12 @@ export function App() {
 
 					<span className="text-muted-foreground/40 text-xs tracking-wide">
 						{isRunning
-							? "space to pause"
-							: isPaused
-								? "space to resume · r to reset"
-								: "space to start"}
-						{isOvertime && " · s to switch"}
+							? isOvertime
+								? `press s to skip to ${phase === "focus" ? "break" : "focus"}`
+								: `press e to end your ${phase}`
+							: phase === "idle"
+								? "press space to start"
+								: "press space to resume · r to reset"}
 					</span>
 
 					<div className="flex items-center gap-4 mt-4">
