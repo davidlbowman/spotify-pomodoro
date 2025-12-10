@@ -14,6 +14,7 @@ import {
 import { useTheme } from "../hooks/useTheme";
 import { useTimer } from "../hooks/useTimer";
 import { cn } from "../lib/utils";
+import { StatsDialog } from "./StatsDialog";
 
 /**
  * Main pomodoro timer application with Spotify playback controls.
@@ -212,7 +213,20 @@ export function App() {
 		>
 			<div className="noise-overlay" />
 
-			<header className="fixed top-0 right-0 p-5 z-50">
+			<header className="fixed top-0 right-0 p-5 z-50 flex gap-2">
+				<StatsDialog>
+					<button
+						type="button"
+						className={cn(
+							"w-10 h-10 rounded-xl flex items-center justify-center",
+							"bg-card/60 backdrop-blur-sm border border-border",
+							"transition-all duration-300 hover:scale-110",
+							"text-sm font-medium",
+						)}
+					>
+						📊
+					</button>
+				</StatsDialog>
 				<button
 					type="button"
 					onClick={toggleTheme}
