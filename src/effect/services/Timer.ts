@@ -5,7 +5,28 @@
  */
 
 import { Effect, Option, Ref, SubscriptionRef } from "effect";
-import { TimerConfig, type TimerPhase, TimerState } from "../schema/TimerState";
+import {
+	TimerConfig,
+	type TimerPhase,
+	type TimerPreset,
+	TimerState,
+} from "../schema/TimerState";
+
+/**
+ * Preset configurations for common pomodoro patterns.
+ *
+ * @since 0.2.0
+ * @category Config
+ */
+export const TIMER_PRESETS: Record<
+	TimerPreset,
+	{ focus: number; break: number }
+> = {
+	classic: { focus: 25 * 60, break: 5 * 60 },
+	long: { focus: 50 * 60, break: 10 * 60 },
+	short: { focus: 15 * 60, break: 3 * 60 },
+	custom: { focus: 25 * 60, break: 5 * 60 },
+};
 
 /**
  * Timer service for managing pomodoro sessions.
@@ -26,8 +47,12 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 				config: new TimerConfig({
 					focusDuration: 25 * 60,
 					breakDuration: 5 * 60,
+					preset: "classic",
 				}),
 				sessionCount: 0,
+				currentPomodoroId: null,
+				currentSessionId: null,
+				elapsedSeconds: 0,
 			}),
 		);
 
@@ -100,6 +125,7 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 			const state = yield* SubscriptionRef.get(stateRef);
 
 			if (state.phase === "idle") {
+				const pomodoroId = crypto.randomUUID();
 				yield* SubscriptionRef.set(
 					stateRef,
 					new TimerState({
@@ -108,6 +134,9 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 						status: "running",
 						remainingSeconds: state.config.focusDuration,
 						overtime: 0,
+						currentPomodoroId: pomodoroId,
+						currentSessionId: null,
+						elapsedSeconds: 0,
 					}),
 				);
 			} else {
@@ -147,28 +176,69 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 			);
 		});
 
-		const switchPhase = Effect.gen(function* () {
-			yield* stopTicking;
-			const state = yield* SubscriptionRef.get(stateRef);
-			const newPhase: TimerPhase = state.phase === "focus" ? "break" : "focus";
-			const duration =
-				newPhase === "focus"
-					? state.config.focusDuration
-					: state.config.breakDuration;
-			const newSessionCount =
-				newPhase === "focus" ? state.sessionCount + 1 : state.sessionCount;
+		const switchPhase = (options?: { autoStart?: boolean }) =>
+			Effect.gen(function* () {
+				yield* stopTicking;
+				const state = yield* SubscriptionRef.get(stateRef);
+				const newPhase: TimerPhase =
+					state.phase === "focus" ? "break" : "focus";
+				const duration =
+					newPhase === "focus"
+						? state.config.focusDuration
+						: state.config.breakDuration;
 
-			yield* SubscriptionRef.set(
-				stateRef,
-				new TimerState({
-					...state,
-					phase: newPhase,
-					status: "stopped",
-					remainingSeconds: duration,
-					overtime: 0,
-					sessionCount: newSessionCount,
-				}),
-			);
+				const newSessionCount =
+					state.phase === "focus" ? state.sessionCount + 1 : state.sessionCount;
+
+				const newPomodoroId =
+					newPhase === "focus" ? crypto.randomUUID() : state.currentPomodoroId;
+
+				const shouldAutoStart = options?.autoStart ?? false;
+
+				yield* SubscriptionRef.set(
+					stateRef,
+					new TimerState({
+						...state,
+						phase: newPhase,
+						status: shouldAutoStart ? "running" : "stopped",
+						remainingSeconds: duration,
+						overtime: 0,
+						sessionCount: newSessionCount,
+						currentPomodoroId: newPomodoroId,
+						currentSessionId: null,
+						elapsedSeconds: 0,
+					}),
+				);
+
+				if (shouldAutoStart) {
+					yield* startTicking;
+				}
+			});
+
+		const endSession = (options?: { switchToNext?: boolean }) =>
+			Effect.gen(function* () {
+				yield* stopTicking;
+				const state = yield* SubscriptionRef.get(stateRef);
+
+				const newSessionCount =
+					state.phase === "focus" ? state.sessionCount + 1 : state.sessionCount;
+
+				if (options?.switchToNext) {
+					yield* switchPhase({ autoStart: true });
+				} else {
+					yield* SubscriptionRef.set(
+						stateRef,
+						new TimerState({
+							...state,
+							status: "stopped",
+							sessionCount: newSessionCount,
+						}),
+					);
+				}
+			});
+
+		const skip = Effect.gen(function* () {
+			yield* switchPhase({ autoStart: true });
 		});
 
 		const setConfig = (config: TimerConfig) =>
@@ -191,6 +261,17 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 				);
 			});
 
+		const setPreset = (preset: TimerPreset) =>
+			Effect.gen(function* () {
+				const { focus, break: breakDuration } = TIMER_PRESETS[preset];
+				const config = new TimerConfig({
+					focusDuration: focus,
+					breakDuration: breakDuration,
+					preset,
+				});
+				yield* setConfig(config);
+			});
+
 		const setOnTimerEnd = (callback: () => void) =>
 			Ref.set(onTimerEndRef, Option.some(callback));
 
@@ -203,7 +284,10 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 			pause,
 			reset,
 			switchPhase,
+			endSession,
+			skip,
 			setConfig,
+			setPreset,
 			setOnTimerEnd,
 		};
 	}),

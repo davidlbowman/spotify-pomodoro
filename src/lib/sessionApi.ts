@@ -1,0 +1,182 @@
+/**
+ * Client-side API for session recording.
+ *
+ * @module
+ */
+
+/**
+ * Pomodoro response from API.
+ *
+ * @since 0.2.0
+ * @category Types
+ */
+export interface PomodoroResponse {
+	id: string;
+	createdAt: number;
+	completedAt: number | null;
+}
+
+/**
+ * Focus/Break session response from API.
+ *
+ * @since 0.2.0
+ * @category Types
+ */
+export interface SessionResponse {
+	id: string;
+	pomodoroId: string;
+	configuredSeconds: number;
+	elapsedSeconds: number;
+	startedAt: number;
+	completedAt: number | null;
+	completed: boolean;
+	createdAt: number;
+}
+
+/**
+ * Stats response from API.
+ *
+ * @since 0.2.0
+ * @category Types
+ */
+export interface StatsResponse {
+	totalPomodoros: number;
+	completedFocusSessions: number;
+	completedBreakSessions: number;
+	totalFocusSeconds: number;
+	totalBreakSeconds: number;
+	totalFocusOvertimeSeconds: number;
+	totalBreakOvertimeSeconds: number;
+	currentStreak: number;
+	longestStreak: number;
+	todayPomodoros: number;
+	thisWeekPomodoros: number;
+}
+
+/**
+ * Create a new pomodoro.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function createPomodoro(): Promise<PomodoroResponse> {
+	const response = await fetch("/api/pomodoros", { method: "POST" });
+	if (!response.ok) {
+		throw new Error(`Failed to create pomodoro: ${response.statusText}`);
+	}
+	return response.json();
+}
+
+/**
+ * Complete a pomodoro.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function completePomodoro(id: string): Promise<PomodoroResponse> {
+	const response = await fetch(`/api/pomodoros/${id}/complete`, {
+		method: "POST",
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to complete pomodoro: ${response.statusText}`);
+	}
+	return response.json();
+}
+
+/**
+ * Create a new focus session.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function createFocusSession(
+	pomodoroId: string,
+	configuredSeconds: number,
+): Promise<SessionResponse> {
+	const response = await fetch("/api/focus-sessions", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ pomodoroId, configuredSeconds }),
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to create focus session: ${response.statusText}`);
+	}
+	return response.json();
+}
+
+/**
+ * Complete a focus session.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function completeFocusSession(
+	id: string,
+	elapsedSeconds: number,
+): Promise<SessionResponse> {
+	const response = await fetch(`/api/focus-sessions/${id}/complete`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ elapsedSeconds }),
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to complete focus session: ${response.statusText}`);
+	}
+	return response.json();
+}
+
+/**
+ * Create a new break session.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function createBreakSession(
+	pomodoroId: string,
+	configuredSeconds: number,
+): Promise<SessionResponse> {
+	const response = await fetch("/api/break-sessions", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ pomodoroId, configuredSeconds }),
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to create break session: ${response.statusText}`);
+	}
+	return response.json();
+}
+
+/**
+ * Complete a break session.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function completeBreakSession(
+	id: string,
+	elapsedSeconds: number,
+): Promise<SessionResponse> {
+	const response = await fetch(`/api/break-sessions/${id}/complete`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ elapsedSeconds }),
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to complete break session: ${response.statusText}`);
+	}
+	return response.json();
+}
+
+/**
+ * Get session statistics.
+ *
+ * @since 0.2.0
+ * @category API
+ */
+export async function getStats(): Promise<StatsResponse> {
+	const response = await fetch("/api/stats");
+	if (!response.ok) {
+		throw new Error(`Failed to get stats: ${response.statusText}`);
+	}
+	return response.json();
+}

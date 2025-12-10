@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
  * @category Components
  */
 export function TimerDisplay() {
-	const { state, start, pause, reset, switchPhase } = useTimer();
+	const { state, start, reset, skip } = useTimer();
 
 	if (!state) {
 		return (
@@ -29,7 +29,7 @@ export function TimerDisplay() {
 	}
 
 	const isRunning = state.status === "running";
-	const isPaused = state.status === "paused";
+	const isStopped = state.status === "stopped" || state.status === "paused";
 	const isOvertime = state.isOvertime;
 
 	return (
@@ -64,20 +64,30 @@ export function TimerDisplay() {
 				<div className="flex justify-center gap-3">
 					{!isRunning && (
 						<Button onClick={start} size="lg" className="w-24">
-							{isPaused ? "Resume" : "Start"}
+							Start
 						</Button>
 					)}
-					{isRunning && (
+					{isRunning && !isOvertime && (
 						<Button
-							onClick={pause}
+							onClick={() => skip()}
+							variant="secondary"
+							size="lg"
+							className="w-28"
+						>
+							End Early
+						</Button>
+					)}
+					{isRunning && isOvertime && (
+						<Button
+							onClick={() => skip()}
 							variant="secondary"
 							size="lg"
 							className="w-24"
 						>
-							Pause
+							Skip
 						</Button>
 					)}
-					{(isPaused || (isRunning && isOvertime)) && (
+					{isStopped && state.phase !== "idle" && (
 						<Button
 							onClick={reset}
 							variant="outline"
@@ -89,15 +99,15 @@ export function TimerDisplay() {
 					)}
 				</div>
 
-				{state.phase !== "idle" && (
+				{state.phase !== "idle" && !isRunning && (
 					<div className="flex justify-center">
 						<Button
-							onClick={switchPhase}
+							onClick={() => skip()}
 							variant="ghost"
 							size="sm"
 							className="text-muted-foreground"
 						>
-							Switch to {state.phase === "focus" ? "Break" : "Focus"}
+							Skip to {state.phase === "focus" ? "Break" : "Focus"}
 						</Button>
 					</div>
 				)}

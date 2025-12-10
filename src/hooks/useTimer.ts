@@ -5,11 +5,23 @@
  */
 
 import { Effect, Stream, SubscriptionRef } from "effect";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getRuntime, runEffect } from "../effect/runtime";
-import { TimerConfig, type TimerState } from "../effect/schema/TimerState";
+import {
+	TimerConfig,
+	type TimerPreset,
+	type TimerState,
+} from "../effect/schema/TimerState";
 import { AudioNotification } from "../effect/services/AudioNotification";
-import { Timer } from "../effect/services/Timer";
+import { TIMER_PRESETS, Timer } from "../effect/services/Timer";
+import {
+	completeBreakSession,
+	completeFocusSession,
+	completePomodoro,
+	createBreakSession,
+	createFocusSession,
+	createPomodoro,
+} from "../lib/sessionApi";
 
 /**
  * Hook for managing pomodoro timer state and controls.
@@ -19,6 +31,10 @@ import { Timer } from "../effect/services/Timer";
  */
 export function useTimer() {
 	const [state, setState] = useState<TimerState | null>(null);
+	const prevStateRef = useRef<TimerState | null>(null);
+	const dbPomodoroIdRef = useRef<string | null>(null);
+	const dbFocusSessionIdRef = useRef<string | null>(null);
+	const dbBreakSessionIdRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		const runtime = getRuntime();
@@ -50,10 +66,90 @@ export function useTimer() {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!state) return;
+
+		const prev = prevStateRef.current;
+		prevStateRef.current = state;
+
+		if (!prev) return;
+
+		const phaseChanged = prev.phase !== state.phase;
+		const justStartedRunning =
+			prev.status !== "running" && state.status === "running";
+		const isNowRunning = state.status === "running";
+
+		if (phaseChanged && prev.phase !== "idle") {
+			const elapsedSeconds = prev.totalElapsedSeconds;
+
+			if (prev.phase === "focus" && dbFocusSessionIdRef.current) {
+				completeFocusSession(dbFocusSessionIdRef.current, elapsedSeconds).catch(
+					(e) => console.error("Failed to complete focus session:", e),
+				);
+				dbFocusSessionIdRef.current = null;
+			} else if (prev.phase === "break" && dbBreakSessionIdRef.current) {
+				completeBreakSession(dbBreakSessionIdRef.current, elapsedSeconds).catch(
+					(e) => console.error("Failed to complete break session:", e),
+				);
+				dbBreakSessionIdRef.current = null;
+
+				if (state.phase === "focus" && dbPomodoroIdRef.current) {
+					completePomodoro(dbPomodoroIdRef.current).catch((e) =>
+						console.error("Failed to complete pomodoro:", e),
+					);
+					dbPomodoroIdRef.current = null;
+				}
+			}
+		}
+
+		const shouldCreateSession =
+			(justStartedRunning && (phaseChanged || prev.phase === "idle")) ||
+			(phaseChanged && isNowRunning && state.phase !== "idle");
+
+		if (shouldCreateSession) {
+			(async () => {
+				try {
+					if (state.phase === "focus") {
+						if (!dbPomodoroIdRef.current) {
+							const pomodoro = await createPomodoro();
+							dbPomodoroIdRef.current = pomodoro.id;
+						}
+						const focusSession = await createFocusSession(
+							dbPomodoroIdRef.current,
+							state.config.focusDuration,
+						);
+						dbFocusSessionIdRef.current = focusSession.id;
+					} else if (state.phase === "break" && dbPomodoroIdRef.current) {
+						const breakSession = await createBreakSession(
+							dbPomodoroIdRef.current,
+							state.config.breakDuration,
+						);
+						dbBreakSessionIdRef.current = breakSession.id;
+					}
+				} catch (e) {
+					console.error("Failed to create session:", e);
+				}
+			})();
+		}
+	}, [state]);
+
 	const start = useCallback(() => runEffect(Timer.start), []);
-	const pause = useCallback(() => runEffect(Timer.pause), []);
 	const reset = useCallback(() => runEffect(Timer.reset), []);
-	const switchPhase = useCallback(() => runEffect(Timer.switchPhase), []);
+
+	const switchPhase = useCallback(
+		(options?: { autoStart?: boolean }) =>
+			runEffect(Timer.switchPhase(options)),
+		[],
+	);
+
+	const endSession = useCallback(
+		(options?: { switchToNext?: boolean }) =>
+			runEffect(Timer.endSession(options)),
+		[],
+	);
+
+	const skip = useCallback(() => runEffect(Timer.skip), []);
+
 	const setConfig = useCallback(
 		(focusMinutes: number, breakMinutes: number) =>
 			runEffect(
@@ -61,18 +157,27 @@ export function useTimer() {
 					new TimerConfig({
 						focusDuration: focusMinutes * 60,
 						breakDuration: breakMinutes * 60,
+						preset: "custom",
 					}),
 				),
 			),
 		[],
 	);
 
+	const setPreset = useCallback(
+		(preset: TimerPreset) => runEffect(Timer.setPreset(preset)),
+		[],
+	);
+
 	return {
 		state,
 		start,
-		pause,
 		reset,
 		switchPhase,
+		endSession,
+		skip,
 		setConfig,
+		setPreset,
+		presets: TIMER_PRESETS,
 	};
 }

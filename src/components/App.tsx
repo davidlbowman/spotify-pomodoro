@@ -14,6 +14,7 @@ import {
 import { useTheme } from "../hooks/useTheme";
 import { useTimer } from "../hooks/useTimer";
 import { cn } from "../lib/utils";
+import { StatsDialog } from "./StatsDialog";
 
 /**
  * Main pomodoro timer application with Spotify playback controls.
@@ -23,7 +24,7 @@ import { cn } from "../lib/utils";
  */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
-	const { state, start, pause, reset, switchPhase, setConfig } = useTimer();
+	const { state, start, reset, skip } = useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
 	const {
@@ -35,20 +36,15 @@ export function App() {
 		setRepeat,
 	} = useSpotifyPlayback();
 
-	const [isEditingMinutes, setIsEditingMinutes] = useState(false);
-	const [editValue, setEditValue] = useState("");
 	const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(
 		null,
 	);
 	const [showPlaylists, setShowPlaylists] = useState(false);
 	const [isPlayingIntent, setIsPlayingIntent] = useState(false);
-	const inputRef = useRef<HTMLInputElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const isRunning = state?.status === "running";
-	const isPaused = state?.status === "paused";
 	const isOvertime = state?.isOvertime ?? false;
-	const isStopped = state?.status === "stopped";
 	const phase = state?.phase ?? "idle";
 	const isPlaying = playbackState?.isPlaying ?? false;
 
@@ -57,11 +53,6 @@ export function App() {
 		? ["+", displayTime.slice(1)]
 		: ["", displayTime];
 	const [minutes, seconds] = timeWithoutSign.split(":");
-
-	const configuredMinutes =
-		phase === "break"
-			? Math.floor((state?.config.breakDuration ?? 300) / 60)
-			: Math.floor((state?.config.focusDuration ?? 1500) / 60);
 
 	useEffect(() => {
 		if (isAuthenticated) {
@@ -76,79 +67,34 @@ export function App() {
 		}
 	}, [playbackState]);
 
+	const endEarly = useCallback(() => {
+		skip();
+	}, [skip]);
+
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (isEditingMinutes || e.target instanceof HTMLInputElement) return;
+			if (e.target instanceof HTMLInputElement) return;
 
 			if (e.code === "Space" || e.code === "Enter") {
 				e.preventDefault();
-				if (isRunning) {
-					pause();
-				} else {
+				if (!isRunning) {
 					start();
 				}
-			} else if (e.code === "KeyR" && (isPaused || isOvertime)) {
+			} else if (e.code === "KeyR" && !isRunning && phase !== "idle") {
 				e.preventDefault();
 				reset();
+			} else if (e.code === "KeyE" && isRunning && !isOvertime) {
+				e.preventDefault();
+				endEarly();
 			} else if (e.code === "KeyS" && isOvertime) {
 				e.preventDefault();
-				switchPhase();
+				skip();
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [
-		isRunning,
-		isPaused,
-		isOvertime,
-		isEditingMinutes,
-		start,
-		pause,
-		reset,
-		switchPhase,
-	]);
-
-	const handleMinutesClick = useCallback(() => {
-		if (isStopped || phase === "idle") {
-			setEditValue(configuredMinutes.toString());
-			setIsEditingMinutes(true);
-		}
-	}, [isStopped, phase, configuredMinutes]);
-
-	const handleEditSubmit = useCallback(() => {
-		const newMinutes = Math.max(1, Math.min(120, Number(editValue) || 1));
-		if (phase === "break") {
-			setConfig(
-				Math.floor((state?.config.focusDuration ?? 1500) / 60),
-				newMinutes,
-			);
-		} else {
-			setConfig(
-				newMinutes,
-				Math.floor((state?.config.breakDuration ?? 300) / 60),
-			);
-		}
-		setIsEditingMinutes(false);
-	}, [editValue, phase, state?.config, setConfig]);
-
-	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
-			if (e.key === "Enter") {
-				handleEditSubmit();
-			} else if (e.key === "Escape") {
-				setIsEditingMinutes(false);
-			}
-		},
-		[handleEditSubmit],
-	);
-
-	useEffect(() => {
-		if (isEditingMinutes && inputRef.current) {
-			inputRef.current.focus();
-			inputRef.current.select();
-		}
-	}, [isEditingMinutes]);
+	}, [isRunning, isOvertime, start, reset, skip, endEarly, phase]);
 
 	const handlePlaylistSelect = async (playlist: Playlist) => {
 		setSelectedPlaylist(playlist);
@@ -185,14 +131,6 @@ export function App() {
 				? "glow-break"
 				: "glow-idle";
 
-	const borderColorClass = isOvertime
-		? "border-[var(--lofi-overtime)]"
-		: phase === "focus"
-			? "border-[var(--lofi-focus)]"
-			: phase === "break"
-				? "border-[var(--lofi-break)]"
-				: "border-[var(--lofi-idle)]";
-
 	if (!state) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
@@ -211,7 +149,20 @@ export function App() {
 		>
 			<div className="noise-overlay" />
 
-			<header className="fixed top-0 right-0 p-5 z-50">
+			<header className="fixed top-0 right-0 p-5 z-50 flex gap-2">
+				<StatsDialog>
+					<button
+						type="button"
+						className={cn(
+							"w-10 h-10 rounded-xl flex items-center justify-center",
+							"bg-card/60 backdrop-blur-sm border border-border",
+							"transition-all duration-300 hover:scale-110",
+							"text-sm font-medium",
+						)}
+					>
+						📊
+					</button>
+				</StatsDialog>
 				<button
 					type="button"
 					onClick={toggleTheme}
@@ -258,42 +209,9 @@ export function App() {
 						>
 							{sign && <span className="animate-pulse-soft">{sign}</span>}
 
-							{isEditingMinutes ? (
-								<input
-									ref={inputRef}
-									type="number"
-									min={1}
-									max={120}
-									value={editValue}
-									onChange={(e) => setEditValue(e.target.value)}
-									onBlur={handleEditSubmit}
-									onKeyDown={handleKeyDown}
-									className={cn(
-										"w-[1.4em] bg-transparent border-b-2",
-										borderColorClass,
-										"text-center outline-none font-digital timer-display-input",
-										"appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-										colorClass,
-									)}
-								/>
-							) : isStopped || phase === "idle" ? (
-								<button
-									type="button"
-									onClick={handleMinutesClick}
-									className={cn(
-										"digit-transition inline-block w-[1.4em] text-center",
-										"cursor-pointer hover:opacity-60 transition-opacity",
-										"bg-transparent border-none p-0 font-digital timer-display",
-										colorClass,
-									)}
-								>
-									{minutes}
-								</button>
-							) : (
-								<span className="digit-transition inline-block w-[1.4em] text-center">
-									{minutes}
-								</span>
-							)}
+							<span className="digit-transition inline-block w-[1.4em] text-center">
+								{minutes}
+							</span>
 
 							<span className="mx-1">:</span>
 
@@ -305,11 +223,12 @@ export function App() {
 
 					<span className="text-muted-foreground/40 text-xs tracking-wide">
 						{isRunning
-							? "space to pause"
-							: isPaused
-								? "space to resume · r to reset"
-								: "space to start"}
-						{isOvertime && " · s to switch"}
+							? isOvertime
+								? `press s to skip to ${phase === "focus" ? "break" : "focus"}`
+								: `press e to end your ${phase}`
+							: phase === "idle"
+								? "press space to start"
+								: "press space to resume · r to reset"}
 					</span>
 
 					<div className="flex items-center gap-4 mt-4">
