@@ -75,12 +75,11 @@ export function useTimer() {
 		if (!prev) return;
 
 		const phaseChanged = prev.phase !== state.phase;
-		const startedRunning =
+		const justStartedRunning =
 			prev.status !== "running" && state.status === "running";
-		const stoppedRunning =
-			prev.status === "running" && state.status !== "running";
+		const isNowRunning = state.status === "running";
 
-		if (phaseChanged && prev.phase !== "idle" && stoppedRunning) {
+		if (phaseChanged && prev.phase !== "idle") {
 			const elapsedSeconds = prev.totalElapsedSeconds;
 
 			if (prev.phase === "focus" && dbFocusSessionIdRef.current) {
@@ -103,7 +102,11 @@ export function useTimer() {
 			}
 		}
 
-		if (startedRunning && (phaseChanged || prev.phase === "idle")) {
+		const shouldCreateSession =
+			(justStartedRunning && (phaseChanged || prev.phase === "idle")) ||
+			(phaseChanged && isNowRunning && state.phase !== "idle");
+
+		if (shouldCreateSession) {
 			(async () => {
 				try {
 					if (state.phase === "focus") {
@@ -131,7 +134,6 @@ export function useTimer() {
 	}, [state]);
 
 	const start = useCallback(() => runEffect(Timer.start), []);
-	const pause = useCallback(() => runEffect(Timer.pause), []);
 	const reset = useCallback(() => runEffect(Timer.reset), []);
 
 	const switchPhase = useCallback(
@@ -170,7 +172,6 @@ export function useTimer() {
 	return {
 		state,
 		start,
-		pause,
 		reset,
 		switchPhase,
 		endSession,
