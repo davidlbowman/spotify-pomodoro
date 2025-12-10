@@ -19,19 +19,37 @@ A self-hosted pomodoro timer with Spotify integration and a lofi aesthetic. Focu
 2. Click "Create App"
 3. Fill in the details:
    - **App name:** Spotify Pomodoro
-   - **Redirect URI:** `http://YOUR_SERVER_IP:2500/callback`
+   - **Redirect URI:** See setup options below
    - **APIs used:** Check "Web API"
 4. Copy the **Client ID** from your app's settings
 
-### 2. Configure Environment
+### 2. Choose Your Setup
 
-Create a `.env` file:
+#### Option A: Local Development (HTTP)
+
+Spotify allows HTTP only for `localhost` or `127.0.0.1`. Use this for local testing:
 
 ```bash
+# .env
 PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
-PUBLIC_SPOTIFY_REDIRECT_URI=http://YOUR_SERVER_IP:2500/callback
-# PORT=2500  # Optional, defaults to 2500
+PUBLIC_SPOTIFY_REDIRECT_URI=http://127.0.0.1:2500/callback
 ```
+
+Add `http://127.0.0.1:2500/callback` to your Spotify app's Redirect URIs.
+
+#### Option B: Production with Custom Domain (HTTPS)
+
+For deployment on a server (Coolify, VPS, etc.), you need HTTPS. Set up a domain with SSL:
+
+```bash
+# .env
+PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
+PUBLIC_SPOTIFY_REDIRECT_URI=https://pomodoro.yourdomain.com/callback
+```
+
+Add `https://pomodoro.yourdomain.com/callback` to your Spotify app's Redirect URIs.
+
+> **Note:** Spotify requires HTTPS for any redirect URI that isn't `localhost` or `127.0.0.1`. If deploying to a local network IP (e.g., `192.168.x.x`), you must set up SSL via a reverse proxy or use a domain with DNS pointing to your server.
 
 ### 3. Run with Docker Compose
 
@@ -39,7 +57,7 @@ PUBLIC_SPOTIFY_REDIRECT_URI=http://YOUR_SERVER_IP:2500/callback
 docker compose up -d
 ```
 
-Open `http://YOUR_SERVER_IP:2500` in your browser.
+Open your configured URL in a browser.
 
 ### Updating
 

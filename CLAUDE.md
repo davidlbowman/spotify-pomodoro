@@ -116,11 +116,24 @@ describe("MyService", () => {
 
 Required for Spotify integration:
 - `PUBLIC_SPOTIFY_CLIENT_ID` - Spotify app client ID
-- `PUBLIC_SPOTIFY_REDIRECT_URI` - OAuth callback URL
+- `PUBLIC_SPOTIFY_REDIRECT_URI` - OAuth callback URL (must be HTTPS except for localhost/127.0.0.1)
+
+## OAuth Architecture
+
+Spotify OAuth uses server-side PKCE flow:
+
+1. `/api/auth/init` - Generates PKCE verifier/challenge using Node crypto, stores verifier in Astro session
+2. `/callback` - Exchanges authorization code for tokens server-side, returns token via URL redirect
+
+This architecture allows HTTP on localhost/127.0.0.1 (Spotify's exception) while production deployments use HTTPS.
+
+**Why server-side?** Browser's `crypto.subtle` API requires "secure context" (HTTPS or localhost). Server-side PKCE uses Node's crypto module which works regardless of transport security.
 
 ## Database
 
 SQLite database stored in `data/pomodoro.db` (gitignored).
+
+Uses `@libsql/client` with Drizzle ORM for cross-runtime compatibility (works in both Node/Vitest and Bun).
 
 **Tables:**
 - `pomodoros` - Parent entity for focus/break cycle

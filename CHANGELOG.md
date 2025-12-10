@@ -13,18 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker Compose deployment for self-hosting
 - Health check endpoint (`/api/health`) for container monitoring
 - Coolify-compatible deployment
+- Server-side OAuth PKCE flow for HTTP compatibility on local networks
+- Astro sessions for secure PKCE state management
+- PR template with CONTRIBUTING.md checklist
 
 ### Changed
 
-- README rewritten for Docker-first deployment
+- README rewritten for Docker-first deployment with local/HTTPS setup options
 - Removed custom timer configuration (replaced with presets)
 - Improved timer hint text clarity ("end early", "begin" instead of "skip")
+- Switched from better-sqlite3 to libsql for cross-runtime compatibility
+
+### Fixed
+
+- DialogContent accessibility warning (added aria-describedby)
+- OAuth flow works on HTTP for localhost/127.0.0.1 (Spotify requirement)
 
 ### Technical
 
-- Multi-stage Dockerfile with `oven/bun:1` base
+- Multi-stage Dockerfile with `oven/bun:1-slim` base
 - Production and development compose files
 - SQLite persistence via Docker volume
+- Server-side PKCE using Node crypto (bypasses browser secure context requirement)
+- libsql client for Bun runtime compatibility
 
 ## [0.2.0] - 2025-12-10
 
