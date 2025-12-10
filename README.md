@@ -4,8 +4,7 @@ A lofi-styled pomodoro timer with Spotify integration and session tracking. Focu
 
 ## Features
 
-- Configurable focus and break durations (click the minutes to edit)
-- Timer presets: Classic (25/5), Long (50/10), Short (15/3)
+- 25-minute focus / 5-minute break pomodoro timer
 - Overtime mode - timer counts up after completion, you decide when to switch
 - Session statistics - track your focus time, streaks, and overtime
 - Spotify integration with playlist selection

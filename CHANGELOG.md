@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Session statistics dashboard with metrics (pomodoros, focus time, streaks, overtime)
 - SQLite database for session persistence (Drizzle ORM)
-- Timer presets: Classic (25/5), Long (50/10), Short (15/3)
 - End early / skip workflow (removed pause functionality)
 - REST API endpoints for session recording
 - Unit tests with Vitest and @effect/vitest (49 tests)

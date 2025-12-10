@@ -24,7 +24,7 @@ import { StatsDialog } from "./StatsDialog";
  */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
-	const { state, start, reset, skip, setConfig } = useTimer();
+	const { state, start, reset, skip } = useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
 	const {
@@ -36,19 +36,15 @@ export function App() {
 		setRepeat,
 	} = useSpotifyPlayback();
 
-	const [isEditingMinutes, setIsEditingMinutes] = useState(false);
-	const [editValue, setEditValue] = useState("");
 	const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(
 		null,
 	);
 	const [showPlaylists, setShowPlaylists] = useState(false);
 	const [isPlayingIntent, setIsPlayingIntent] = useState(false);
-	const inputRef = useRef<HTMLInputElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const isRunning = state?.status === "running";
 	const isOvertime = state?.isOvertime ?? false;
-	const isStopped = state?.status === "stopped" || state?.status === "paused";
 	const phase = state?.phase ?? "idle";
 	const isPlaying = playbackState?.isPlaying ?? false;
 
@@ -57,11 +53,6 @@ export function App() {
 		? ["+", displayTime.slice(1)]
 		: ["", displayTime];
 	const [minutes, seconds] = timeWithoutSign.split(":");
-
-	const configuredMinutes =
-		phase === "break"
-			? Math.floor((state?.config.breakDuration ?? 300) / 60)
-			: Math.floor((state?.config.focusDuration ?? 1500) / 60);
 
 	useEffect(() => {
 		if (isAuthenticated) {
@@ -82,7 +73,7 @@ export function App() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (isEditingMinutes || e.target instanceof HTMLInputElement) return;
+			if (e.target instanceof HTMLInputElement) return;
 
 			if (e.code === "Space" || e.code === "Enter") {
 				e.preventDefault();
@@ -103,57 +94,7 @@ export function App() {
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [
-		isRunning,
-		isOvertime,
-		isEditingMinutes,
-		start,
-		reset,
-		skip,
-		endEarly,
-		phase,
-	]);
-
-	const handleMinutesClick = useCallback(() => {
-		if (isStopped || phase === "idle") {
-			setEditValue(configuredMinutes.toString());
-			setIsEditingMinutes(true);
-		}
-	}, [isStopped, phase, configuredMinutes]);
-
-	const handleEditSubmit = useCallback(() => {
-		const newMinutes = Math.max(1, Math.min(120, Number(editValue) || 1));
-		if (phase === "break") {
-			setConfig(
-				Math.floor((state?.config.focusDuration ?? 1500) / 60),
-				newMinutes,
-			);
-		} else {
-			setConfig(
-				newMinutes,
-				Math.floor((state?.config.breakDuration ?? 300) / 60),
-			);
-		}
-		setIsEditingMinutes(false);
-	}, [editValue, phase, state?.config, setConfig]);
-
-	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
-			if (e.key === "Enter") {
-				handleEditSubmit();
-			} else if (e.key === "Escape") {
-				setIsEditingMinutes(false);
-			}
-		},
-		[handleEditSubmit],
-	);
-
-	useEffect(() => {
-		if (isEditingMinutes && inputRef.current) {
-			inputRef.current.focus();
-			inputRef.current.select();
-		}
-	}, [isEditingMinutes]);
+	}, [isRunning, isOvertime, start, reset, skip, endEarly, phase]);
 
 	const handlePlaylistSelect = async (playlist: Playlist) => {
 		setSelectedPlaylist(playlist);
@@ -189,14 +130,6 @@ export function App() {
 			: phase === "break"
 				? "glow-break"
 				: "glow-idle";
-
-	const borderColorClass = isOvertime
-		? "border-[var(--lofi-overtime)]"
-		: phase === "focus"
-			? "border-[var(--lofi-focus)]"
-			: phase === "break"
-				? "border-[var(--lofi-break)]"
-				: "border-[var(--lofi-idle)]";
 
 	if (!state) {
 		return (
@@ -276,42 +209,9 @@ export function App() {
 						>
 							{sign && <span className="animate-pulse-soft">{sign}</span>}
 
-							{isEditingMinutes ? (
-								<input
-									ref={inputRef}
-									type="number"
-									min={1}
-									max={120}
-									value={editValue}
-									onChange={(e) => setEditValue(e.target.value)}
-									onBlur={handleEditSubmit}
-									onKeyDown={handleKeyDown}
-									className={cn(
-										"w-[1.4em] bg-transparent border-b-2",
-										borderColorClass,
-										"text-center outline-none font-digital timer-display-input",
-										"appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-										colorClass,
-									)}
-								/>
-							) : isStopped || phase === "idle" ? (
-								<button
-									type="button"
-									onClick={handleMinutesClick}
-									className={cn(
-										"digit-transition inline-block w-[1.4em] text-center",
-										"cursor-pointer hover:opacity-60 transition-opacity",
-										"bg-transparent border-none p-0 font-digital timer-display",
-										colorClass,
-									)}
-								>
-									{minutes}
-								</button>
-							) : (
-								<span className="digit-transition inline-block w-[1.4em] text-center">
-									{minutes}
-								</span>
-							)}
+							<span className="digit-transition inline-block w-[1.4em] text-center">
+								{minutes}
+							</span>
 
 							<span className="mx-1">:</span>
 
