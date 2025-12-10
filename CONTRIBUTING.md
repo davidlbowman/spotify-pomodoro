@@ -69,7 +69,8 @@ const fetchPlaylists = Effect.gen(function* () {
 // Bad
 // Fetch playlists from Spotify
 const fetchPlaylists = Effect.gen(function* () {
-  /* implementation */ // inline comment
+  /* implementation */
+  // inline comment
 });
 ```
 
@@ -114,6 +115,7 @@ export class MyService extends Effect.Service<MyService>()("MyService", {
 ```
 
 Key points:
+
 - Always include `accessors: true` (except for config services using `sync`)
 - Include JSDoc with `@since` and `@category` tags
 - Declare dependencies explicitly
@@ -135,7 +137,7 @@ export class SpotifyApiError extends Schema.TaggedError<SpotifyApiError>()(
   {
     message: Schema.String,
     statusCode: Schema.optionalWith(Schema.Number, { as: "Option" }),
-  }
+  },
 ) {}
 ```
 
@@ -144,10 +146,7 @@ export class SpotifyApiError extends Schema.TaggedError<SpotifyApiError>()(
 Compose services using Layers:
 
 ```typescript
-const FullLayer = Layer.mergeAll(
-  ServiceA.Default,
-  ServiceB.Default,
-).pipe(
+const FullLayer = Layer.mergeAll(ServiceA.Default, ServiceB.Default).pipe(
   Layer.provide(ConfigLayer),
   Layer.provide(HttpClient.layer),
 );
@@ -175,7 +174,7 @@ describe("MyService", () => {
     Effect.gen(function* () {
       const result = yield* MyService.doSomething;
       expect(result).toBe("done");
-    }).pipe(Effect.provide(MyService.Default))
+    }).pipe(Effect.provide(MyService.Default)),
   );
 });
 ```
@@ -191,6 +190,7 @@ The project uses SQLite with Drizzle ORM. When making schema changes:
 5. Include the migration file in your PR
 
 Useful commands:
+
 - `bun run db:studio` - Open database GUI
 - `bun run db:clean` - Clear all data
 

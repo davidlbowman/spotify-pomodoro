@@ -68,25 +68,25 @@ Open [https://localhost:2500](https://localhost:2500) in your browser.
 
 ## Keyboard Controls
 
-| Key | Action |
-|-----|--------|
-| `Space` / `Enter` | Start timer |
-| `E` | End current session early (during countdown) |
-| `S` | Skip to next phase (during overtime) |
-| `R` | Reset timer (when stopped) |
+| Key               | Action                                       |
+| ----------------- | -------------------------------------------- |
+| `Space` / `Enter` | Start timer                                  |
+| `E`               | End current session early (during countdown) |
+| `S`               | Skip to next phase (during overtime)         |
+| `R`               | Reset timer (when stopped)                   |
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start development server |
-| `bun run build` | Build for production |
-| `bun run test` | Run tests |
-| `bun run lint` | Check for linting issues |
-| `bun run typecheck` | Run TypeScript type checking |
-| `bun run db:migrate` | Apply database migrations |
-| `bun run db:clean` | Clear all session data |
-| `bun run db:studio` | Open database GUI |
+| Command              | Description                  |
+| -------------------- | ---------------------------- |
+| `bun run dev`        | Start development server     |
+| `bun run build`      | Build for production         |
+| `bun run test`       | Run tests                    |
+| `bun run lint`       | Check for linting issues     |
+| `bun run typecheck`  | Run TypeScript type checking |
+| `bun run db:migrate` | Apply database migrations    |
+| `bun run db:clean`   | Clear all session data       |
+| `bun run db:studio`  | Open database GUI            |
 
 ## Data Persistence
 
@@ -95,6 +95,7 @@ Session data is stored locally in `data/pomodoro.db` (SQLite). This directory is
 **Important:** The database is local to your machine. If you delete the `data/` folder or clone fresh, you'll start with an empty database. Future versions will support Docker for easier data persistence across updates.
 
 To reset your data:
+
 ```bash
 bun run db:clean
 ```
@@ -126,6 +127,7 @@ Browser autoplay policies may block audio. Interact with the page before the tim
 ### Database errors
 
 If you see database errors, try:
+
 ```bash
 rm -rf data/
 bun run db:migrate
