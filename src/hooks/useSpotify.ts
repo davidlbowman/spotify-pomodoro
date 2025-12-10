@@ -97,12 +97,16 @@ export function useSpotifyPlayback() {
 		null,
 	);
 	const [isLoading, setIsLoading] = useState(false);
+	const [lastDeviceId, setLastDeviceId] = useState<string | null>(null);
 
 	const fetchPlaybackState = useCallback(async () => {
 		setIsLoading(true);
 		try {
 			const result = await runEffect(SpotifyClient.getPlaybackState);
 			setPlaybackState(result);
+			if (result?.deviceId) {
+				setLastDeviceId(result.deviceId);
+			}
 		} catch {
 			// Ignore errors - user might not have an active device
 		} finally {
@@ -112,10 +116,11 @@ export function useSpotifyPlayback() {
 
 	const play = useCallback(
 		async (options?: { contextUri?: string; uris?: string[] }) => {
-			await runEffect(SpotifyClient.play(options));
+			const deviceId = playbackState?.deviceId ?? lastDeviceId ?? undefined;
+			await runEffect(SpotifyClient.play({ ...options, deviceId }));
 			await fetchPlaybackState();
 		},
-		[fetchPlaybackState],
+		[fetchPlaybackState, playbackState?.deviceId, lastDeviceId],
 	);
 
 	const pause = useCallback(async () => {

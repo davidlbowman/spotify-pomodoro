@@ -28,8 +28,6 @@ export function useTimer() {
 			const timer = yield* Timer;
 			const audio = yield* AudioNotification;
 
-			yield* audio.init;
-
 			yield* timer.setOnTimerEnd(() => {
 				runEffect(audio.play);
 			});

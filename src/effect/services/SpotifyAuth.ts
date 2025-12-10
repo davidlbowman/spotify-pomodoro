@@ -93,14 +93,18 @@ export class SpotifyAuth extends Effect.Service<SpotifyAuth>()("SpotifyAuth", {
 				let maybeChallenge = yield* Ref.get(challengeRef);
 
 				if (Option.isNone(maybeChallenge)) {
-					const stored = yield* Effect.sync(() =>
-						sessionStorage.getItem("spotify_pkce"),
-					);
-					if (stored) {
-						const parsed = JSON.parse(stored);
-						const pkce = new PKCEChallenge(parsed);
-						yield* Ref.set(challengeRef, Option.some(pkce));
-						maybeChallenge = Option.some(pkce);
+					const restored = yield* Effect.try({
+						try: () => {
+							const stored = sessionStorage.getItem("spotify_pkce");
+							if (!stored) return null;
+							const parsed = JSON.parse(stored);
+							return new PKCEChallenge(parsed);
+						},
+						catch: () => null,
+					});
+					if (restored) {
+						yield* Ref.set(challengeRef, Option.some(restored));
+						maybeChallenge = Option.some(restored);
 					}
 				}
 

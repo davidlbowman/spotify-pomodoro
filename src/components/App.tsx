@@ -28,6 +28,7 @@ export function App() {
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
 	const {
 		playbackState,
+		fetchPlaybackState,
 		play,
 		pause: pauseMusic,
 		setShuffle,
@@ -65,8 +66,9 @@ export function App() {
 	useEffect(() => {
 		if (isAuthenticated) {
 			fetchPlaylists();
+			fetchPlaybackState();
 		}
-	}, [isAuthenticated, fetchPlaylists]);
+	}, [isAuthenticated, fetchPlaylists, fetchPlaybackState]);
 
 	useEffect(() => {
 		if (playbackState) {

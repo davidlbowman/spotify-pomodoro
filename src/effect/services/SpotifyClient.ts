@@ -167,7 +167,11 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 				}),
 			);
 
-			const play = (options?: { contextUri?: string; uris?: string[] }) =>
+			const play = (options?: {
+				contextUri?: string;
+				uris?: string[];
+				deviceId?: string;
+			}) =>
 				authorizedFetch((accessToken) =>
 					Effect.gen(function* () {
 						const body = options?.contextUri
@@ -176,9 +180,11 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 								? { uris: options.uris }
 								: {};
 
-						const request = HttpClientRequest.put(
-							`${SPOTIFY_API_BASE}/me/player/play`,
-						).pipe(
+						const url = options?.deviceId
+							? `${SPOTIFY_API_BASE}/me/player/play?device_id=${options.deviceId}`
+							: `${SPOTIFY_API_BASE}/me/player/play`;
+
+						const request = HttpClientRequest.put(url).pipe(
 							HttpClientRequest.setHeader(
 								"Authorization",
 								`Bearer ${accessToken}`,
