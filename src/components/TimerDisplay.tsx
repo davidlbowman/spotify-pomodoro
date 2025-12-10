@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
  * @category Components
  */
 export function TimerDisplay() {
-	const { state, start, pause, reset, switchPhase } = useTimer();
+	const { state, start, pause, reset, skip } = useTimer();
 
 	if (!state) {
 		return (
@@ -92,12 +92,12 @@ export function TimerDisplay() {
 				{state.phase !== "idle" && (
 					<div className="flex justify-center">
 						<Button
-							onClick={switchPhase}
+							onClick={() => skip()}
 							variant="ghost"
 							size="sm"
 							className="text-muted-foreground"
 						>
-							Switch to {state.phase === "focus" ? "Break" : "Focus"}
+							Skip to {state.phase === "focus" ? "Break" : "Focus"}
 						</Button>
 					</div>
 				)}

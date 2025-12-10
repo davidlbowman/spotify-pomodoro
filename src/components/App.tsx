@@ -23,7 +23,8 @@ import { cn } from "../lib/utils";
  */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
-	const { state, start, pause, reset, switchPhase, setConfig } = useTimer();
+	const { state, start, pause, reset, skip, setConfig, setPreset, presets } =
+		useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
 	const {
@@ -92,7 +93,7 @@ export function App() {
 				reset();
 			} else if (e.code === "KeyS" && isOvertime) {
 				e.preventDefault();
-				switchPhase();
+				skip();
 			}
 		};
 
@@ -106,7 +107,7 @@ export function App() {
 		start,
 		pause,
 		reset,
-		switchPhase,
+		skip,
 	]);
 
 	const handleMinutesClick = useCallback(() => {

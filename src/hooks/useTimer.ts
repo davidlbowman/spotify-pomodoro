@@ -7,9 +7,13 @@
 import { Effect, Stream, SubscriptionRef } from "effect";
 import { useCallback, useEffect, useState } from "react";
 import { getRuntime, runEffect } from "../effect/runtime";
-import { TimerConfig, type TimerState } from "../effect/schema/TimerState";
+import {
+	TimerConfig,
+	type TimerPreset,
+	type TimerState,
+} from "../effect/schema/TimerState";
 import { AudioNotification } from "../effect/services/AudioNotification";
-import { Timer } from "../effect/services/Timer";
+import { TIMER_PRESETS, Timer } from "../effect/services/Timer";
 
 /**
  * Hook for managing pomodoro timer state and controls.
@@ -53,7 +57,21 @@ export function useTimer() {
 	const start = useCallback(() => runEffect(Timer.start), []);
 	const pause = useCallback(() => runEffect(Timer.pause), []);
 	const reset = useCallback(() => runEffect(Timer.reset), []);
-	const switchPhase = useCallback(() => runEffect(Timer.switchPhase), []);
+
+	const switchPhase = useCallback(
+		(options?: { autoStart?: boolean }) =>
+			runEffect(Timer.switchPhase(options)),
+		[],
+	);
+
+	const endSession = useCallback(
+		(options?: { switchToNext?: boolean }) =>
+			runEffect(Timer.endSession(options)),
+		[],
+	);
+
+	const skip = useCallback(() => runEffect(Timer.skip), []);
+
 	const setConfig = useCallback(
 		(focusMinutes: number, breakMinutes: number) =>
 			runEffect(
@@ -61,9 +79,15 @@ export function useTimer() {
 					new TimerConfig({
 						focusDuration: focusMinutes * 60,
 						breakDuration: breakMinutes * 60,
+						preset: "custom",
 					}),
 				),
 			),
+		[],
+	);
+
+	const setPreset = useCallback(
+		(preset: TimerPreset) => runEffect(Timer.setPreset(preset)),
 		[],
 	);
 
@@ -73,6 +97,10 @@ export function useTimer() {
 		pause,
 		reset,
 		switchPhase,
+		endSession,
+		skip,
 		setConfig,
+		setPreset,
+		presets: TIMER_PRESETS,
 	};
 }

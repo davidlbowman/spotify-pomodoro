@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # docs (local strategy/planning docs)
 docs/
+
+# SQLite database
+data/
