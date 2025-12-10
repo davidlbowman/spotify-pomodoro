@@ -27,6 +27,14 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
+# Copy migration files and config for db:migrate
+COPY --from=builder /app/src/db/migrations ./src/db/migrations
+COPY --from=builder /app/drizzle.config.ts ./
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
 # Create data directory for SQLite
 RUN mkdir -p /app/data
 
@@ -40,4 +48,4 @@ EXPOSE 2500
 
 VOLUME ["/app/data"]
 
-CMD ["bun", "run", "./dist/server/entry.mjs"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
