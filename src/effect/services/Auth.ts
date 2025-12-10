@@ -39,6 +39,14 @@ export const COOKIE_NAME = "auth_token";
 const DEFAULT_MAX_AGE = 604800;
 
 /**
+ * Hardcoded username for simplicity.
+ *
+ * @since 1.1.0
+ * @category Auth
+ */
+const AUTH_USERNAME = "admin";
+
+/**
  * Authentication service for managing auth state.
  *
  * @since 1.1.0
@@ -57,21 +65,20 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 		 */
 		const getConfig = Effect.gen(function* () {
 			const enabled = yield* isEnabled;
-			const username = process.env.AUTH_USERNAME;
 			const password = process.env.AUTH_PASSWORD;
 			const secret = process.env.AUTH_SECRET;
 			const maxAge = Number(process.env.AUTH_COOKIE_MAX_AGE) || DEFAULT_MAX_AGE;
 
-			if (enabled && (!username || !password || !secret)) {
+			if (enabled && (!password || !secret)) {
 				return yield* Effect.fail(
 					new AuthConfigError({
 						message:
-							"AUTH_ENABLED=true but AUTH_USERNAME, AUTH_PASSWORD, or AUTH_SECRET is missing",
+							"AUTH_ENABLED=true but AUTH_PASSWORD or AUTH_SECRET is missing",
 					}),
 				);
 			}
 
-			return { username, password, secret, maxAge, enabled };
+			return { password, secret, maxAge, enabled };
 		});
 
 		/**
@@ -167,7 +174,7 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 				const config = yield* getConfig;
 
 				const userBuffer = Buffer.from(username);
-				const expectedUserBuffer = Buffer.from(config.username || "");
+				const expectedUserBuffer = Buffer.from(AUTH_USERNAME);
 				const passBuffer = Buffer.from(password);
 				const expectedPassBuffer = Buffer.from(config.password || "");
 

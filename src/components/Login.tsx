@@ -24,7 +24,7 @@ interface LoginProps {
  * @category Components
  */
 export function Login({ returnUrl = "/" }: LoginProps) {
-	const [username, setUsername] = useState("");
+	const [username, setUsername] = useState("admin");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
