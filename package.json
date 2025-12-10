@@ -15,6 +15,7 @@
 		"db:studio": "drizzle-kit studio"
 	},
 	"dependencies": {
+		"@astrojs/node": "^9.5.1",
 		"@astrojs/react": "^4.4.2",
 		"@effect/platform": "^0.93.6",
 		"@effect/platform-browser": "^0.73.0",
