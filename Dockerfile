@@ -34,9 +34,9 @@ RUN mkdir -p /app/data
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 ENV HOST=0.0.0.0
-ENV PORT=4321
+ENV PORT=2500
 
-EXPOSE 4321
+EXPOSE 2500
 
 VOLUME ["/app/data"]
 

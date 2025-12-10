@@ -19,7 +19,7 @@ A self-hosted pomodoro timer with Spotify integration and a lofi aesthetic. Focu
 2. Click "Create App"
 3. Fill in the details:
    - **App name:** Spotify Pomodoro
-   - **Redirect URI:** `http://YOUR_SERVER_IP:4321/callback`
+   - **Redirect URI:** `http://YOUR_SERVER_IP:2500/callback`
    - **APIs used:** Check "Web API"
 4. Copy the **Client ID** from your app's settings
 
@@ -29,7 +29,8 @@ Create a `.env` file:
 
 ```bash
 PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
-PUBLIC_SPOTIFY_REDIRECT_URI=http://YOUR_SERVER_IP:4321/callback
+PUBLIC_SPOTIFY_REDIRECT_URI=http://YOUR_SERVER_IP:2500/callback
+# PORT=2500  # Optional, defaults to 2500
 ```
 
 ### 3. Run with Docker Compose
@@ -38,7 +39,7 @@ PUBLIC_SPOTIFY_REDIRECT_URI=http://YOUR_SERVER_IP:4321/callback
 docker compose up -d
 ```
 
-Open `http://YOUR_SERVER_IP:4321` in your browser.
+Open `http://YOUR_SERVER_IP:2500` in your browser.
 
 ### Updating
 
@@ -116,7 +117,7 @@ Spotify requires an active device to control playback. Open Spotify on your comp
 
 ### Container health check failing
 
-Check logs with `docker compose logs`. Ensure port 4321 is not in use by another service.
+Check logs with `docker compose logs`. Ensure port 2500 is not in use by another service.
 
 ## License
 
