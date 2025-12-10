@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    ports:
+      - "4321:4321"
+    volumes:
+      - pomodoro_data:/app/data
+    environment:
+      - PUBLIC_SPOTIFY_CLIENT_ID=${PUBLIC_SPOTIFY_CLIENT_ID}
+      - PUBLIC_SPOTIFY_REDIRECT_URI=${PUBLIC_SPOTIFY_REDIRECT_URI}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4321/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pomodoro_data:

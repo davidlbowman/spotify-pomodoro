@@ -28,6 +28,9 @@ A Spotify-integrated pomodoro timer app with a lofi aesthetic.
 | `bun run db:migrate` | Apply database migrations |
 | `bun run db:studio` | Open Drizzle Studio |
 | `bun run db:clean` | Delete all session data |
+| `docker compose up -d` | Run production container |
+| `docker compose -f docker-compose.dev.yml up` | Run dev container |
+| `docker compose down -v` | Stop and remove volumes |
 
 ## Project Structure
 
@@ -135,4 +138,4 @@ SQLite database stored in `data/pomodoro.db` (gitignored).
 - Timer uses countdown then overtime behavior (counts up after hitting zero)
 - Spotify playback requires an active device
 - Session recording happens automatically on phase transitions
-- Database is local-only; future versions will use Docker for persistence
+- Docker deployment uses named volume `pomodoro_data` for SQLite persistence

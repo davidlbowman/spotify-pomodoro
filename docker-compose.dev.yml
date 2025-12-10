@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      target: builder
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - pomodoro_data:/app/data
+    environment:
+      - PUBLIC_SPOTIFY_CLIENT_ID=${PUBLIC_SPOTIFY_CLIENT_ID}
+      - PUBLIC_SPOTIFY_REDIRECT_URI=${PUBLIC_SPOTIFY_REDIRECT_URI}
+    command: bun run dev --host 0.0.0.0
+
+volumes:
+  pomodoro_data:
