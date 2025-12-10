@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-10
+
+### Added
+
+- Optional authentication for VPS deployments (#15)
+- Login page with lofi aesthetic
+- Stateless signed cookie authentication (HMAC-SHA256)
+- Auth middleware protecting all routes when enabled
+- 13 unit tests for Auth service (62 total)
+- Docker convenience scripts (`bun run docker:dev`, `docker:down`, `docker:logs`)
+
+### Security
+
+- Timing-safe credential comparison prevents timing attacks
+- HttpOnly cookies prevent XSS token theft
+- Cookie signature verification prevents tampering
+
+### Configuration
+
+New optional environment variables:
+- `AUTH_ENABLED` - Enable authentication (default: false)
+- `AUTH_PASSWORD` - Login password (username is always "admin")
+- `AUTH_SECRET` - Secret for signing cookies
+
 ## [1.0.0] - 2025-12-10
 
 ### Added
@@ -110,6 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Spotify Web API integration for playback control
 - JSDoc documentation throughout codebase
 
+[1.1.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.0.2...0.1.0
