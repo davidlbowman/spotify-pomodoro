@@ -18,8 +18,11 @@ git clone https://github.com/davidlbowman/spotify-pomodoro.git
 cd spotify-pomodoro
 bun install
 
-# Run type checking
-bun run typecheck
+# Initialize database
+bun run db:migrate
+
+# Run tests
+bun run test
 
 # Start development server
 bun run dev
@@ -29,12 +32,12 @@ bun run dev
 
 1. Create a feature branch from `main`
 2. Make your changes
-3. Run lint and typecheck
+3. Run lint, typecheck, and tests
 4. Submit a PR
 
 ```bash
 # Ensure code quality before committing
-bun run lint:fix && bun run typecheck
+bun run lint:fix && bun run typecheck && bun run test
 ```
 
 ## Code Style
@@ -150,12 +153,54 @@ const FullLayer = Layer.mergeAll(
 );
 ```
 
+## Testing
+
+This project uses [Vitest](https://vitest.dev/) with [@effect/vitest](https://effect.website/docs/guides/testing) for testing Effect services.
+
+### Running Tests
+
+```bash
+bun run test        # Run once
+bun run test:watch  # Watch mode
+```
+
+### Writing Tests
+
+```typescript
+import { describe, expect, it } from "@effect/vitest";
+import { Effect } from "effect";
+
+describe("MyService", () => {
+  it.effect("does something", () =>
+    Effect.gen(function* () {
+      const result = yield* MyService.doSomething;
+      expect(result).toBe("done");
+    }).pipe(Effect.provide(MyService.Default))
+  );
+});
+```
+
+## Database Changes
+
+The project uses SQLite with Drizzle ORM. When making schema changes:
+
+1. Modify schema in `src/db/schema.ts`
+2. Generate migration: `bun run db:generate`
+3. Review the SQL in `src/db/migrations/`
+4. Apply migration: `bun run db:migrate`
+5. Include the migration file in your PR
+
+Useful commands:
+- `bun run db:studio` - Open database GUI
+- `bun run db:clean` - Clear all data
+
 ## Project Structure
 
 ```
 spotify-pomodoro/
 ├── src/
-│   ├── pages/              # Astro pages
+│   ├── pages/              # Astro pages and API routes
+│   │   └── api/            # REST API endpoints
 │   ├── components/         # React components
 │   │   └── ui/             # shadcn/ui components
 │   ├── hooks/              # React hooks
@@ -163,8 +208,11 @@ spotify-pomodoro/
 │   │   ├── services/       # Effect services
 │   │   ├── schema/         # Effect Schema definitions
 │   │   └── errors/         # Tagged error types
+│   ├── db/                 # Database schema and migrations
 │   ├── lib/                # Utility functions
 │   └── styles/             # Global CSS
+├── test/                   # Test files
+├── scripts/                # Utility scripts
 └── public/                 # Static assets
 ```
 
@@ -181,8 +229,10 @@ spotify-pomodoro/
 3. **PR checklist**:
    - [ ] Code passes `bun run lint`
    - [ ] Code passes `bun run typecheck`
+   - [ ] Code passes `bun run test`
    - [ ] JSDoc comments for public APIs
    - [ ] No inline/block comments (JSDoc only)
+   - [ ] Database migrations included (if schema changed)
 
 4. **Review process**: PRs require one approval before merging
 

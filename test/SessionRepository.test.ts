@@ -3,20 +3,11 @@
  *
  * @module
  */
-import { afterAll, beforeAll, describe, expect, it } from "@effect/vitest";
+import { describe, expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import {
-	BreakSessionNotFoundError,
-	FocusSessionNotFoundError,
-	PomodoroNotFoundError,
-} from "@/effect/errors/DatabaseError";
 import { SessionRepository } from "@/effect/services/SessionRepository";
 
 describe("SessionRepository Service", () => {
-	let testPomodoroId: string;
-	let testFocusSessionId: string;
-	let testBreakSessionId: string;
-
 	describe("createPomodoro", () => {
 		it.effect("creates a new pomodoro", () =>
 			Effect.gen(function* () {
@@ -26,7 +17,6 @@ describe("SessionRepository Service", () => {
 				expect(typeof pomodoro.id).toBe("string");
 				expect(pomodoro.createdAt).toBeInstanceOf(Date);
 				expect(pomodoro.completedAt).toBeNull();
-				testPomodoroId = pomodoro.id;
 			}).pipe(Effect.provide(SessionRepository.Default)),
 		);
 	});
@@ -77,7 +67,6 @@ describe("SessionRepository Service", () => {
 				expect(focusSession.configuredSeconds).toBe(1500);
 				expect(focusSession.elapsedSeconds).toBe(0);
 				expect(focusSession.completed).toBe(false);
-				testFocusSessionId = focusSession.id;
 			}).pipe(Effect.provide(SessionRepository.Default)),
 		);
 	});
@@ -159,7 +148,6 @@ describe("SessionRepository Service", () => {
 				expect(breakSession.configuredSeconds).toBe(300);
 				expect(breakSession.elapsedSeconds).toBe(0);
 				expect(breakSession.completed).toBe(false);
-				testBreakSessionId = breakSession.id;
 			}).pipe(Effect.provide(SessionRepository.Default)),
 		);
 	});

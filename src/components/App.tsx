@@ -24,8 +24,7 @@ import { StatsDialog } from "./StatsDialog";
  */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
-	const { state, start, reset, skip, setConfig, setPreset, presets } =
-		useTimer();
+	const { state, start, reset, skip, setConfig } = useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
 	const {

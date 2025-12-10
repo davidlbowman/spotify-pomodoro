@@ -1,23 +1,25 @@
 # Spotify Pomodoro
 
-A lofi-styled pomodoro timer with Spotify integration. Focus on your work while your favorite playlists play in the background.
+A lofi-styled pomodoro timer with Spotify integration and session tracking. Focus on your work while your favorite playlists play in the background.
 
 ## Features
 
 - Configurable focus and break durations (click the minutes to edit)
-- Timer counts up after completion (overtime mode) - you decide when to take a break
+- Timer presets: Classic (25/5), Long (50/10), Short (15/3)
+- Overtime mode - timer counts up after completion, you decide when to switch
+- Session statistics - track your focus time, streaks, and overtime
 - Spotify integration with playlist selection
 - Auto-shuffle and repeat for continuous music
 - Light/dark theme toggle
 - Keyboard-first controls
 - Audio notification when timer ends
 
-## Local Development Setup
+## Quick Start
 
 ### Prerequisites
 
 - [Bun](https://bun.sh/) v1.0+
-- A Spotify Developer account
+- A Spotify Developer account (for music integration)
 
 ### 1. Clone and Install
 
@@ -27,58 +29,51 @@ cd spotify-pomodoro
 bun install
 ```
 
-### 2. Create a Spotify App
+### 2. Initialize the Database
+
+```bash
+bun run db:migrate
+```
+
+This creates the SQLite database at `data/pomodoro.db` for storing your session history.
+
+### 3. Create a Spotify App (Optional)
+
+Skip this step if you don't need Spotify integration.
 
 1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
 2. Click "Create App"
 3. Fill in the details:
-   - **App name:** Spotify Pomodoro (or whatever you prefer)
-   - **App description:** Pomodoro timer with Spotify
-   - **Redirect URI:** `http://127.0.0.1:4321/callback`
+   - **App name:** Spotify Pomodoro
+   - **Redirect URI:** `https://127.0.0.1:2500/callback`
    - **APIs used:** Check "Web API"
-4. Click "Save"
-5. In your app's settings, copy the **Client ID**
+4. Copy the **Client ID** from your app's settings
 
-### 3. Configure Environment Variables
+### 4. Configure Environment Variables
 
 Create a `.env` file in the project root:
 
 ```bash
 PUBLIC_SPOTIFY_CLIENT_ID=your_client_id_here
-PUBLIC_SPOTIFY_REDIRECT_URI=http://127.0.0.1:4321/callback
+PUBLIC_SPOTIFY_REDIRECT_URI=https://127.0.0.1:2500/callback
 ```
 
-Replace `your_client_id_here` with the Client ID from step 2.
-
-### 4. Start the Development Server
+### 5. Start the Development Server
 
 ```bash
 bun run dev
 ```
 
-Open [http://localhost:4321](http://localhost:4321) in your browser.
-
-### 5. Connect Spotify
-
-1. Click the "spotify" button
-2. Authorize the app with your Spotify account
-3. Select a playlist and start focusing!
+Open [https://localhost:2500](https://localhost:2500) in your browser.
 
 ## Keyboard Controls
 
 | Key | Action |
 |-----|--------|
-| `Space` / `Enter` | Start/pause timer |
-| `R` | Reset timer (when paused or in overtime) |
-| `S` | Switch phase (when in overtime) |
-
-## Tech Stack
-
-- **Runtime:** Bun
-- **Framework:** Astro with React
-- **Styling:** Tailwind CSS v4 + shadcn/ui
-- **State Management:** Effect-TS
-- **Linting:** Biome
+| `Space` / `Enter` | Start timer |
+| `E` | End current session early (during countdown) |
+| `S` | Skip to next phase (during overtime) |
+| `R` | Reset timer (when stopped) |
 
 ## Available Scripts
 
@@ -86,16 +81,39 @@ Open [http://localhost:4321](http://localhost:4321) in your browser.
 |---------|-------------|
 | `bun run dev` | Start development server |
 | `bun run build` | Build for production |
-| `bun run preview` | Preview production build |
+| `bun run test` | Run tests |
 | `bun run lint` | Check for linting issues |
-| `bun run lint:fix` | Auto-fix linting issues |
 | `bun run typecheck` | Run TypeScript type checking |
+| `bun run db:migrate` | Apply database migrations |
+| `bun run db:clean` | Clear all session data |
+| `bun run db:studio` | Open database GUI |
+
+## Data Persistence
+
+Session data is stored locally in `data/pomodoro.db` (SQLite). This directory is gitignored.
+
+**Important:** The database is local to your machine. If you delete the `data/` folder or clone fresh, you'll start with an empty database. Future versions will support Docker for easier data persistence across updates.
+
+To reset your data:
+```bash
+bun run db:clean
+```
+
+## Tech Stack
+
+- **Runtime:** Bun
+- **Framework:** Astro with React (SSR)
+- **Database:** SQLite with Drizzle ORM
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **State Management:** Effect-TS
+- **Testing:** Vitest with @effect/vitest
+- **Linting:** Biome
 
 ## Troubleshooting
 
 ### "Invalid redirect URI"
 
-Make sure the redirect URI in your Spotify app settings exactly matches `PUBLIC_SPOTIFY_REDIRECT_URI` in your `.env` file, including the protocol (`http://` vs `https://`).
+Make sure the redirect URI in your Spotify app settings exactly matches `PUBLIC_SPOTIFY_REDIRECT_URI` in your `.env` file.
 
 ### "No active device"
 
@@ -103,12 +121,15 @@ Spotify requires an active device to control playback. Open Spotify on your comp
 
 ### Timer notification not playing
 
-Browser autoplay policies may block audio. Interact with the page (click anywhere) before the timer ends to enable audio.
+Browser autoplay policies may block audio. Interact with the page before the timer ends to enable audio.
 
-## Questions or Issues?
+### Database errors
 
-- [Report a bug](https://github.com/davidlbowman/spotify-pomodoro/issues/new?template=bug_report.md)
-- [Request a feature](https://github.com/davidlbowman/spotify-pomodoro/issues/new?template=feature_request.md)
+If you see database errors, try:
+```bash
+rm -rf data/
+bun run db:migrate
+```
 
 ## Contributing
 

@@ -5,9 +5,11 @@ A Spotify-integrated pomodoro timer app with a lofi aesthetic.
 ## Tech Stack
 
 - **Runtime**: Bun
-- **Framework**: Astro with React
+- **Framework**: Astro with React (SSR mode with Node adapter)
 - **Styling**: Tailwind CSS v4 + shadcn/ui
 - **State Management**: Effect-TS
+- **Database**: SQLite with Drizzle ORM
+- **Testing**: Vitest with @effect/vitest
 - **Linting/Formatting**: Biome
 
 ## Commands
@@ -20,21 +22,33 @@ A Spotify-integrated pomodoro timer app with a lofi aesthetic.
 | `bun run lint` | Check linting |
 | `bun run lint:fix` | Fix linting issues |
 | `bun run typecheck` | Run type checking |
+| `bun run test` | Run tests once |
+| `bun run test:watch` | Run tests in watch mode |
+| `bun run db:generate` | Generate database migrations |
+| `bun run db:migrate` | Apply database migrations |
+| `bun run db:studio` | Open Drizzle Studio |
+| `bun run db:clean` | Delete all session data |
 
 ## Project Structure
 
 ```
 src/
-├── pages/              # Astro pages
+├── pages/              # Astro pages and API routes
+│   └── api/            # REST API endpoints
 ├── components/         # React components
 │   └── ui/             # shadcn/ui components
-├── hooks/              # React hooks (useTimer, useSpotify)
+├── hooks/              # React hooks (useTimer, useSpotify, useStats)
 ├── effect/
-│   ├── services/       # Effect services (Timer, SpotifyClient, etc.)
+│   ├── services/       # Effect services (Timer, SessionRepository, etc.)
 │   ├── schema/         # Effect Schema definitions
 │   └── errors/         # Tagged error types
-├── lib/                # Utility functions
+├── db/                 # Database schema and migrations
+├── lib/                # Utility functions and API client
 └── styles/             # Global CSS with Tailwind
+
+test/                   # Vitest test files
+scripts/                # Utility scripts (db-clean, etc.)
+data/                   # SQLite database (gitignored)
 ```
 
 ## Code Conventions
@@ -66,6 +80,24 @@ All services use `Effect.Service` pattern:
 - Declare dependencies explicitly in `dependencies` array
 - Use `Schema.TaggedError` for error types
 
+### Testing
+
+Use `@effect/vitest` for testing Effect services:
+
+```typescript
+import { describe, expect, it } from "@effect/vitest";
+import { Effect } from "effect";
+
+describe("MyService", () => {
+  it.effect("does something", () =>
+    Effect.gen(function* () {
+      const result = yield* MyService.doSomething;
+      expect(result).toBe(expected);
+    }).pipe(Effect.provide(MyService.Default))
+  );
+});
+```
+
 ### Imports
 
 - Use `@/` path alias for imports from `src/`
@@ -75,6 +107,7 @@ All services use `Effect.Service` pattern:
 
 - React components need `client:load` directive in Astro for interactivity
 - Keep components focused and composable
+- API routes use Astro server endpoints (`src/pages/api/`)
 
 ## Environment Variables
 
@@ -82,8 +115,24 @@ Required for Spotify integration:
 - `PUBLIC_SPOTIFY_CLIENT_ID` - Spotify app client ID
 - `PUBLIC_SPOTIFY_REDIRECT_URI` - OAuth callback URL
 
+## Database
+
+SQLite database stored in `data/pomodoro.db` (gitignored).
+
+**Tables:**
+- `pomodoros` - Parent entity for focus/break cycle
+- `focus_sessions` - Focus session records
+- `break_sessions` - Break session records
+
+**Workflow:**
+1. Modify schema in `src/db/schema.ts`
+2. Run `bun run db:generate` to create migration
+3. Run `bun run db:migrate` to apply migration
+
 ## Notes
 
 - Biome is configured to skip Tailwind CSS files (global.css)
 - Timer uses countdown then overtime behavior (counts up after hitting zero)
 - Spotify playback requires an active device
+- Session recording happens automatically on phase transitions
+- Database is local-only; future versions will use Docker for persistence

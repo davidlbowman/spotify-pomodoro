@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Session statistics dashboard with metrics (pomodoros, focus time, streaks, overtime)
+- SQLite database for session persistence (Drizzle ORM)
+- Timer presets: Classic (25/5), Long (50/10), Short (15/3)
+- End early / skip workflow (removed pause functionality)
+- REST API endpoints for session recording
+- Unit tests with Vitest and @effect/vitest (49 tests)
+- Database management scripts (db:migrate, db:clean, db:studio)
+
+### Changed
+
+- Timer flow: press E to end early, S to skip (no more pause)
+- Astro now runs in SSR mode with Node adapter
+- Help text shows contextual hints based on timer state
+
+### Technical
+
+- SessionRepository service for database operations
+- Automatic session recording on phase transitions
+- better-sqlite3 for Node.js compatibility
+
 ## [0.1.0] - 2025-12-10
 
 ### Fixed
