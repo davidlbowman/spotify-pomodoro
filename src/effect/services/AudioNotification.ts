@@ -22,46 +22,46 @@ export class AudioNotification extends Effect.Service<AudioNotification>()(
 				Option.none(),
 			);
 
-			const init = Effect.gen(function* () {
+			const getOrCreateContext = Effect.gen(function* () {
+				const maybeCtx = yield* Ref.get(audioContextRef);
+				if (Option.isSome(maybeCtx)) {
+					return maybeCtx.value;
+				}
 				const ctx = yield* Effect.sync(() => new AudioContext());
 				yield* Ref.set(audioContextRef, Option.some(ctx));
+				return ctx;
 			});
 
 			const play = Effect.gen(function* () {
-				const maybeCtx = yield* Ref.get(audioContextRef);
-				yield* Option.match(maybeCtx, {
-					onNone: () => Effect.void,
-					onSome: (ctx) =>
-						Effect.sync(() => {
-							if (ctx.state === "suspended") {
-								ctx.resume();
-							}
+				const ctx = yield* getOrCreateContext;
+				yield* Effect.sync(() => {
+					if (ctx.state === "suspended") {
+						ctx.resume();
+					}
 
-							const oscillator = ctx.createOscillator();
-							const gainNode = ctx.createGain();
+					const oscillator = ctx.createOscillator();
+					const gainNode = ctx.createGain();
 
-							oscillator.connect(gainNode);
-							gainNode.connect(ctx.destination);
+					oscillator.connect(gainNode);
+					gainNode.connect(ctx.destination);
 
-							const now = ctx.currentTime;
+					const now = ctx.currentTime;
 
-							oscillator.frequency.setValueAtTime(880, now);
-							oscillator.frequency.setValueAtTime(660, now + 0.15);
+					oscillator.frequency.setValueAtTime(880, now);
+					oscillator.frequency.setValueAtTime(660, now + 0.15);
 
-							gainNode.gain.setValueAtTime(0, now);
-							gainNode.gain.linearRampToValueAtTime(0.9, now + 0.02);
-							gainNode.gain.linearRampToValueAtTime(0.6, now + 0.15);
-							gainNode.gain.linearRampToValueAtTime(0.9, now + 0.17);
-							gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+					gainNode.gain.setValueAtTime(0, now);
+					gainNode.gain.linearRampToValueAtTime(0.9, now + 0.02);
+					gainNode.gain.linearRampToValueAtTime(0.6, now + 0.15);
+					gainNode.gain.linearRampToValueAtTime(0.9, now + 0.17);
+					gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
 
-							oscillator.start(now);
-							oscillator.stop(now + 0.4);
-						}),
+					oscillator.start(now);
+					oscillator.stop(now + 0.4);
 				});
 			});
 
 			return {
-				init,
 				play,
 			};
 		}),
