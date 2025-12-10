@@ -12,7 +12,8 @@
 		"typecheck": "astro check",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio"
+		"db:studio": "drizzle-kit studio",
+		"db:clean": "bun run scripts/db-clean.ts"
 	},
 	"dependencies": {
 		"@astrojs/node": "^9.5.1",
