@@ -25,7 +25,7 @@ const program = Effect.gen(function* () {
 	yield* Effect.try(() => db.delete(pomodoros).run());
 	yield* Effect.log("  ✓ Deleted pomodoros");
 
-	yield* Effect.try(() => sqlite.exec("VACUUM"));
+	yield* Effect.try(() => sqlite.run("VACUUM"));
 	yield* Effect.log("  ✓ Vacuumed database");
 
 	sqlite.close();
