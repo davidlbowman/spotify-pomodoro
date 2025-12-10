@@ -28,9 +28,10 @@ A Spotify-integrated pomodoro timer app with a lofi aesthetic.
 | `bun run db:migrate` | Apply database migrations |
 | `bun run db:studio` | Open Drizzle Studio |
 | `bun run db:clean` | Delete all session data |
-| `docker compose up -d` | Run production container |
-| `docker compose -f docker-compose.dev.yml up` | Run dev container |
-| `docker compose down -v` | Stop and remove volumes |
+| `bun run docker:dev` | Start dev container (detached, with build) |
+| `bun run docker:prod` | Start production container (detached, with build) |
+| `bun run docker:down` | Stop containers |
+| `bun run docker:logs` | Follow container logs |
 
 ## Project Structure
 
