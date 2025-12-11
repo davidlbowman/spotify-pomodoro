@@ -383,6 +383,35 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						completedBreak,
 					);
 
+					const allPomodoroIds = new Set(completedPomodoros.map((p) => p.id));
+					const allPeriodFocus = completedFocus.filter((s) =>
+						allPomodoroIds.has(s.pomodoroId),
+					);
+					const allPeriodBreak = completedBreak.filter((s) =>
+						allPomodoroIds.has(s.pomodoroId),
+					);
+					const all = {
+						pomodoros: completedPomodoros.length,
+						focusSeconds: allPeriodFocus.reduce(
+							(sum, s) => sum + s.elapsedSeconds,
+							0,
+						),
+						breakSeconds: allPeriodBreak.reduce(
+							(sum, s) => sum + s.elapsedSeconds,
+							0,
+						),
+						focusOvertimeSeconds: allPeriodFocus.reduce(
+							(sum, s) =>
+								sum + Math.max(0, s.elapsedSeconds - s.configuredSeconds),
+							0,
+						),
+						breakOvertimeSeconds: allPeriodBreak.reduce(
+							(sum, s) =>
+								sum + Math.max(0, s.elapsedSeconds - s.configuredSeconds),
+							0,
+						),
+					};
+
 					const dailyActivityMap = new Map<
 						string,
 						{ count: number; focusSeconds: number }
@@ -441,6 +470,7 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						today,
 						week,
 						month,
+						all,
 						dailyActivity,
 					} as SessionStats;
 				},

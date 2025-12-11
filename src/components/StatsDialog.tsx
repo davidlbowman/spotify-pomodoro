@@ -48,13 +48,7 @@ export function StatsDialog({ children }: StatsDialogProps) {
 			case "month":
 				return stats.month;
 			case "all":
-				return {
-					pomodoros: stats.completedPomodoros,
-					focusSeconds: stats.totalFocusSeconds,
-					breakSeconds: stats.totalBreakSeconds,
-					focusOvertimeSeconds: stats.totalFocusOvertimeSeconds,
-					breakOvertimeSeconds: stats.totalBreakOvertimeSeconds,
-				};
+				return stats.all;
 		}
 	}, [stats, period]);
 

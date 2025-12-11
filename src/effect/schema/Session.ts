@@ -180,6 +180,8 @@ export class SessionStats extends Schema.Class<SessionStats>("SessionStats")({
 	week: PeriodStats,
 	/** This month's detailed stats */
 	month: PeriodStats,
+	/** All time detailed stats */
+	all: PeriodStats,
 	/** Daily activity for contribution graph (last 365 days) */
 	dailyActivity: Schema.Array(DailyActivity),
 }) {}
