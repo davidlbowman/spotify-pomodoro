@@ -57,7 +57,10 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 		/**
 		 * Check if auth is enabled via environment variable.
 		 */
-		const isEnabled = Effect.sync(() => process.env.AUTH_ENABLED === "true");
+		const isEnabled = Effect.sync(
+			() =>
+				(process.env.AUTH_ENABLED || import.meta.env.AUTH_ENABLED) === "true",
+		);
 
 		/**
 		 * Get auth configuration from environment.
@@ -65,9 +68,14 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 		 */
 		const getConfig = Effect.gen(function* () {
 			const enabled = yield* isEnabled;
-			const password = process.env.AUTH_PASSWORD;
-			const secret = process.env.AUTH_SECRET;
-			const maxAge = Number(process.env.AUTH_COOKIE_MAX_AGE) || DEFAULT_MAX_AGE;
+			const password =
+				process.env.AUTH_PASSWORD || import.meta.env.AUTH_PASSWORD;
+			const secret = process.env.AUTH_SECRET || import.meta.env.AUTH_SECRET;
+			const maxAge =
+				Number(
+					process.env.AUTH_COOKIE_MAX_AGE ||
+						import.meta.env.AUTH_COOKIE_MAX_AGE,
+				) || DEFAULT_MAX_AGE;
 
 			if (enabled && (!password || !secret)) {
 				return yield* Effect.fail(

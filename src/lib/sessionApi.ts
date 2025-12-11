@@ -41,6 +41,7 @@ export interface SessionResponse {
  */
 export interface StatsResponse {
 	totalPomodoros: number;
+	completedPomodoros: number;
 	completedFocusSessions: number;
 	completedBreakSessions: number;
 	totalFocusSeconds: number;

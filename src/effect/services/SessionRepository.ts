@@ -265,18 +265,20 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 					const weekStart = new Date(todayStart);
 					weekStart.setDate(weekStart.getDate() - weekStart.getDay());
 
-					const todayPomodoros = completedFocus.filter(
-						(s) => s.completedAt && new Date(s.completedAt) >= todayStart,
+					const completedPomodoros = allPomodoros.filter((p) => p.completedAt);
+
+					const todayPomodoros = completedPomodoros.filter(
+						(p) => p.completedAt && new Date(p.completedAt) >= todayStart,
 					).length;
 
-					const thisWeekPomodoros = completedFocus.filter(
-						(s) => s.completedAt && new Date(s.completedAt) >= weekStart,
+					const thisWeekPomodoros = completedPomodoros.filter(
+						(p) => p.completedAt && new Date(p.completedAt) >= weekStart,
 					).length;
 
-					const focusDates = new Set(
-						completedFocus.flatMap((s) => {
-							if (!s.completedAt) return [];
-							const d = new Date(s.completedAt);
+					const pomodoroDates = new Set(
+						completedPomodoros.flatMap((p) => {
+							if (!p.completedAt) return [];
+							const d = new Date(p.completedAt);
 							return [`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`];
 						}),
 					);
@@ -287,7 +289,7 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 
 					while (true) {
 						const dateKey = `${checkDate.getFullYear()}-${checkDate.getMonth()}-${checkDate.getDate()}`;
-						if (focusDates.has(dateKey)) {
+						if (pomodoroDates.has(dateKey)) {
 							currentStreak++;
 							checkDate.setDate(checkDate.getDate() - 1);
 						} else {
@@ -295,7 +297,7 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						}
 					}
 
-					const sortedDates = Array.from(focusDates).sort();
+					const sortedDates = Array.from(pomodoroDates).sort();
 					let tempStreak = 1;
 					for (let i = 1; i < sortedDates.length; i++) {
 						const prev = new Date(sortedDates[i - 1]);
@@ -313,11 +315,12 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 					longestStreak = Math.max(
 						longestStreak,
 						currentStreak,
-						focusDates.size > 0 ? 1 : 0,
+						pomodoroDates.size > 0 ? 1 : 0,
 					);
 
 					return {
 						totalPomodoros: allPomodoros.length,
+						completedPomodoros: completedPomodoros.length,
 						completedFocusSessions: completedFocus.length,
 						completedBreakSessions: completedBreak.length,
 						totalFocusSeconds,

@@ -7,8 +7,14 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { APIRoute } from "astro";
 
-const SPOTIFY_CLIENT_ID = process.env.PUBLIC_SPOTIFY_CLIENT_ID ?? "";
-const SPOTIFY_REDIRECT_URI = process.env.PUBLIC_SPOTIFY_REDIRECT_URI ?? "";
+const SPOTIFY_CLIENT_ID =
+	process.env.PUBLIC_SPOTIFY_CLIENT_ID ||
+	import.meta.env.PUBLIC_SPOTIFY_CLIENT_ID ||
+	"";
+const SPOTIFY_REDIRECT_URI =
+	process.env.PUBLIC_SPOTIFY_REDIRECT_URI ||
+	import.meta.env.PUBLIC_SPOTIFY_REDIRECT_URI ||
+	"";
 
 const SCOPES = [
 	"user-read-playback-state",

@@ -58,7 +58,7 @@ export function StatsDialog({ children }: StatsDialogProps) {
 						<div className="grid grid-cols-3 gap-3">
 							<StatCard
 								label="Pomodoros"
-								value={stats.completedFocusSessions}
+								value={stats.completedPomodoros}
 								sublabel="completed"
 							/>
 							<StatCard

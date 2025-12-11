@@ -35,6 +35,8 @@ export function App() {
 		pause: pauseMusic,
 		setShuffle,
 		setRepeat,
+		error: playbackError,
+		clearError,
 	} = useSpotifyPlayback();
 
 	const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(
@@ -374,6 +376,27 @@ export function App() {
 					spotify-pomodoro
 				</a>
 			</footer>
+
+			{playbackError && (
+				<div
+					className={cn(
+						"fixed bottom-4 left-1/2 -translate-x-1/2 z-50",
+						"px-4 py-3 rounded-xl",
+						"bg-destructive/10 border border-destructive/20",
+						"backdrop-blur-sm shadow-lg",
+						"flex items-center gap-3",
+					)}
+				>
+					<span className="text-sm text-destructive">{playbackError}</span>
+					<button
+						type="button"
+						onClick={clearError}
+						className="text-muted-foreground hover:text-foreground transition-colors"
+					>
+						×
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }

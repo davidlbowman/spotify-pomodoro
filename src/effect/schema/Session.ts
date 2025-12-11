@@ -114,6 +114,8 @@ export class CompleteSessionInput extends Schema.Class<CompleteSessionInput>(
 export class SessionStats extends Schema.Class<SessionStats>("SessionStats")({
 	/** Total pomodoro cycles started */
 	totalPomodoros: Schema.Number,
+	/** Total pomodoro cycles completed (focus + break done) */
+	completedPomodoros: Schema.Number,
 	/** Total completed focus sessions */
 	completedFocusSessions: Schema.Number,
 	/** Total completed break sessions */
