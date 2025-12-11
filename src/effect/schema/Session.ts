@@ -106,6 +106,42 @@ export class CompleteSessionInput extends Schema.Class<CompleteSessionInput>(
 }) {}
 
 /**
+ * Daily activity record for contribution graph.
+ *
+ * @since 0.3.0
+ * @category Schemas
+ */
+export class DailyActivity extends Schema.Class<DailyActivity>("DailyActivity")(
+	{
+		/** Date string in YYYY-MM-DD format */
+		date: Schema.String,
+		/** Number of pomodoros completed on this day */
+		count: Schema.Number,
+		/** Total focus seconds on this day */
+		focusSeconds: Schema.Number,
+	},
+) {}
+
+/**
+ * Stats for a specific time period.
+ *
+ * @since 0.3.0
+ * @category Schemas
+ */
+export class PeriodStats extends Schema.Class<PeriodStats>("PeriodStats")({
+	/** Pomodoros completed in this period */
+	pomodoros: Schema.Number,
+	/** Focus time in seconds */
+	focusSeconds: Schema.Number,
+	/** Break time in seconds */
+	breakSeconds: Schema.Number,
+	/** Focus overtime in seconds */
+	focusOvertimeSeconds: Schema.Number,
+	/** Break overtime in seconds */
+	breakOvertimeSeconds: Schema.Number,
+}) {}
+
+/**
  * Stats computed from session data.
  *
  * @since 0.2.0
@@ -136,4 +172,18 @@ export class SessionStats extends Schema.Class<SessionStats>("SessionStats")({
 	todayPomodoros: Schema.Number,
 	/** Pomodoros completed this week */
 	thisWeekPomodoros: Schema.Number,
+	/** Pomodoros completed this month */
+	thisMonthPomodoros: Schema.Number,
+	/** Today's detailed stats */
+	today: PeriodStats,
+	/** This week's detailed stats */
+	week: PeriodStats,
+	/** This month's detailed stats */
+	month: PeriodStats,
+	/** This year's detailed stats */
+	year: PeriodStats,
+	/** All time detailed stats */
+	all: PeriodStats,
+	/** Daily activity for contribution graph (all time) */
+	dailyActivity: Schema.Array(DailyActivity),
 }) {}

@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-12-11
+
+### Added
+
+- GitHub-style contribution graph showing daily pomodoro activity (#22)
+- Year selector to view historical data across multiple years
+- Time period tabs: Today, Week, Month, Year, All
+- Seed script for testing stats with multi-year data
+
+### Changed
+
+- Stats now show full historical data (removed 365-day limit)
+- Consistent calculation across all time periods
+
 ## [1.2.0] - 2025-12-11
 
 ### Added
@@ -153,6 +167,7 @@ New optional environment variables:
 - Spotify Web API integration for playback control
 - JSDoc documentation throughout codebase
 
+[1.3.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.2.0...1.0.0
