@@ -1,0 +1,29 @@
+---
+/**
+ * Login page for authenticated deployments.
+ *
+ * @module
+ * @since 1.1.0
+ * @category Pages
+ */
+import "@/styles/global.css";
+import { Login as LoginForm } from "@/components/Login";
+
+// biome-ignore lint/correctness/noUnusedVariables: used in template below
+const returnUrl = Astro.url.searchParams.get("return") || "/";
+export const prerender = false;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Login - Spotify Pomodoro</title>
+		<meta name="description" content="Login to access Spotify Pomodoro" />
+	</head>
+	<body class="min-h-screen bg-background text-foreground antialiased">
+		<LoginForm client:load returnUrl={returnUrl} />
+	</body>
+</html>

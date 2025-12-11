@@ -106,6 +106,9 @@ export function useSpotifyPlayback() {
 	);
 	const [isLoading, setIsLoading] = useState(false);
 	const [lastDeviceId, setLastDeviceId] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	const clearError = useCallback(() => setError(null), []);
 
 	const fetchPlaybackState = useCallback(async () => {
 		setIsLoading(true);
@@ -124,9 +127,14 @@ export function useSpotifyPlayback() {
 
 	const play = useCallback(
 		async (options?: { contextUri?: string; uris?: string[] }) => {
-			const deviceId = playbackState?.deviceId ?? lastDeviceId ?? undefined;
-			await runEffect(SpotifyClient.play({ ...options, deviceId }));
-			await fetchPlaybackState();
+			setError(null);
+			try {
+				const deviceId = playbackState?.deviceId ?? lastDeviceId ?? undefined;
+				await runEffect(SpotifyClient.play({ ...options, deviceId }));
+				await fetchPlaybackState();
+			} catch {
+				setError("Open Spotify on your phone or computer first");
+			}
 		},
 		[fetchPlaybackState, playbackState?.deviceId, lastDeviceId],
 	);
@@ -147,6 +155,8 @@ export function useSpotifyPlayback() {
 	return {
 		playbackState,
 		isLoading,
+		error,
+		clearError,
 		fetchPlaybackState,
 		play,
 		pause,

@@ -77,6 +77,25 @@ Your session data persists in the `pomodoro_data` volume.
 3. Update your Spotify app's redirect URI to match
 4. Deploy
 
+## Authentication (Optional)
+
+For VPS deployments, you can enable authentication to protect your instance:
+
+```bash
+# .env
+AUTH_ENABLED=true
+AUTH_PASSWORD=your-secure-password
+AUTH_SECRET=random-32-character-string-for-signing
+```
+
+- **Username:** Always `admin` (pre-filled in login form for password manager compatibility)
+- **Password:** Your chosen password from `AUTH_PASSWORD`
+- **Secret:** Any random string used for signing cookies (keep this secret!)
+
+When enabled, all routes require login. The login page appears at `/login`.
+
+> **Tip:** Generate a secure secret with `openssl rand -base64 32`
+
 ## Keyboard Controls
 
 | Key               | Action                                       |

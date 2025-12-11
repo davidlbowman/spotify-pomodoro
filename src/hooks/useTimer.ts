@@ -31,7 +31,6 @@ import {
  */
 export function useTimer() {
 	const [state, setState] = useState<TimerState | null>(null);
-	const prevStateRef = useRef<TimerState | null>(null);
 	const dbPomodoroIdRef = useRef<string | null>(null);
 	const dbFocusSessionIdRef = useRef<string | null>(null);
 	const dbBreakSessionIdRef = useRef<string | null>(null);
@@ -66,89 +65,152 @@ export function useTimer() {
 		};
 	}, []);
 
-	useEffect(() => {
+	const start = useCallback(async () => {
 		if (!state) return;
 
-		const prev = prevStateRef.current;
-		prevStateRef.current = state;
+		if (state.phase === "idle") {
+			try {
+				const pomodoro = await createPomodoro();
+				dbPomodoroIdRef.current = pomodoro.id;
 
-		if (!prev) return;
-
-		const phaseChanged = prev.phase !== state.phase;
-		const justStartedRunning =
-			prev.status !== "running" && state.status === "running";
-		const isNowRunning = state.status === "running";
-
-		if (phaseChanged && prev.phase !== "idle") {
-			const elapsedSeconds = prev.totalElapsedSeconds;
-
-			if (prev.phase === "focus" && dbFocusSessionIdRef.current) {
-				completeFocusSession(dbFocusSessionIdRef.current, elapsedSeconds).catch(
-					(e) => console.error("Failed to complete focus session:", e),
+				const focusSession = await createFocusSession(
+					pomodoro.id,
+					state.config.focusDuration,
 				);
+				dbFocusSessionIdRef.current = focusSession.id;
+			} catch (e) {
+				console.error("Failed to create session:", e);
+			}
+		}
+
+		await runEffect(Timer.start);
+	}, [state]);
+
+	const reset = useCallback(async () => {
+		await runEffect(Timer.reset);
+	}, []);
+
+	const switchPhase = useCallback(
+		async (options?: { autoStart?: boolean }) => {
+			if (!state) return;
+
+			if (state.phase === "focus") {
+				if (dbFocusSessionIdRef.current) {
+					await completeFocusSession(
+						dbFocusSessionIdRef.current,
+						state.totalElapsedSeconds,
+					).catch((e) => console.error("Failed to complete focus session:", e));
+					dbFocusSessionIdRef.current = null;
+				}
+
+				if (dbPomodoroIdRef.current) {
+					const breakSession = await createBreakSession(
+						dbPomodoroIdRef.current,
+						state.config.breakDuration,
+					).catch((e) => {
+						console.error("Failed to create break session:", e);
+						return null;
+					});
+					if (breakSession) {
+						dbBreakSessionIdRef.current = breakSession.id;
+					}
+				}
+			} else if (state.phase === "break") {
+				if (dbBreakSessionIdRef.current) {
+					await completeBreakSession(
+						dbBreakSessionIdRef.current,
+						state.totalElapsedSeconds,
+					).catch((e) => console.error("Failed to complete break session:", e));
+					dbBreakSessionIdRef.current = null;
+				}
+
+				if (dbPomodoroIdRef.current) {
+					await completePomodoro(dbPomodoroIdRef.current).catch((e) =>
+						console.error("Failed to complete pomodoro:", e),
+					);
+					dbPomodoroIdRef.current = null;
+				}
+
+				try {
+					const pomodoro = await createPomodoro();
+					dbPomodoroIdRef.current = pomodoro.id;
+
+					const focusSession = await createFocusSession(
+						pomodoro.id,
+						state.config.focusDuration,
+					);
+					dbFocusSessionIdRef.current = focusSession.id;
+				} catch (e) {
+					console.error("Failed to create new cycle:", e);
+				}
+			}
+
+			await runEffect(Timer.switchPhase(options));
+		},
+		[state],
+	);
+
+	const endSession = useCallback(
+		async (options?: { switchToNext?: boolean }) => {
+			if (!state) return;
+
+			if (state.phase === "focus" && dbFocusSessionIdRef.current) {
+				await completeFocusSession(
+					dbFocusSessionIdRef.current,
+					state.totalElapsedSeconds,
+				).catch((e) => console.error("Failed to complete focus session:", e));
 				dbFocusSessionIdRef.current = null;
-			} else if (prev.phase === "break" && dbBreakSessionIdRef.current) {
-				completeBreakSession(dbBreakSessionIdRef.current, elapsedSeconds).catch(
-					(e) => console.error("Failed to complete break session:", e),
-				);
+			} else if (state.phase === "break" && dbBreakSessionIdRef.current) {
+				await completeBreakSession(
+					dbBreakSessionIdRef.current,
+					state.totalElapsedSeconds,
+				).catch((e) => console.error("Failed to complete break session:", e));
 				dbBreakSessionIdRef.current = null;
 
-				if (state.phase === "focus" && dbPomodoroIdRef.current) {
-					completePomodoro(dbPomodoroIdRef.current).catch((e) =>
+				if (dbPomodoroIdRef.current) {
+					await completePomodoro(dbPomodoroIdRef.current).catch((e) =>
 						console.error("Failed to complete pomodoro:", e),
 					);
 					dbPomodoroIdRef.current = null;
 				}
 			}
-		}
 
-		const shouldCreateSession =
-			(justStartedRunning && (phaseChanged || prev.phase === "idle")) ||
-			(phaseChanged && isNowRunning && state.phase !== "idle");
+			if (options?.switchToNext) {
+				if (state.phase === "focus" && dbPomodoroIdRef.current) {
+					const breakSession = await createBreakSession(
+						dbPomodoroIdRef.current,
+						state.config.breakDuration,
+					).catch((e) => {
+						console.error("Failed to create break session:", e);
+						return null;
+					});
+					if (breakSession) {
+						dbBreakSessionIdRef.current = breakSession.id;
+					}
+				} else if (state.phase === "break") {
+					try {
+						const pomodoro = await createPomodoro();
+						dbPomodoroIdRef.current = pomodoro.id;
 
-		if (shouldCreateSession) {
-			(async () => {
-				try {
-					if (state.phase === "focus") {
-						if (!dbPomodoroIdRef.current) {
-							const pomodoro = await createPomodoro();
-							dbPomodoroIdRef.current = pomodoro.id;
-						}
 						const focusSession = await createFocusSession(
-							dbPomodoroIdRef.current,
+							pomodoro.id,
 							state.config.focusDuration,
 						);
 						dbFocusSessionIdRef.current = focusSession.id;
-					} else if (state.phase === "break" && dbPomodoroIdRef.current) {
-						const breakSession = await createBreakSession(
-							dbPomodoroIdRef.current,
-							state.config.breakDuration,
-						);
-						dbBreakSessionIdRef.current = breakSession.id;
+					} catch (e) {
+						console.error("Failed to create new cycle:", e);
 					}
-				} catch (e) {
-					console.error("Failed to create session:", e);
 				}
-			})();
-		}
-	}, [state]);
+			}
 
-	const start = useCallback(() => runEffect(Timer.start), []);
-	const reset = useCallback(() => runEffect(Timer.reset), []);
-
-	const switchPhase = useCallback(
-		(options?: { autoStart?: boolean }) =>
-			runEffect(Timer.switchPhase(options)),
-		[],
+			await runEffect(Timer.endSession(options));
+		},
+		[state],
 	);
 
-	const endSession = useCallback(
-		(options?: { switchToNext?: boolean }) =>
-			runEffect(Timer.endSession(options)),
-		[],
-	);
-
-	const skip = useCallback(() => runEffect(Timer.skip), []);
+	const skip = useCallback(async () => {
+		await switchPhase({ autoStart: true });
+	}, [switchPhase]);
 
 	const setConfig = useCallback(
 		(focusMinutes: number, breakMinutes: number) =>

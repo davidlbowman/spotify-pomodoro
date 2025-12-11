@@ -1,7 +1,7 @@
 {
 	"name": "spotify-pomodoro",
 	"type": "module",
-	"version": "0.2.0",
+	"version": "1.1.0",
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
@@ -15,7 +15,11 @@
 		"db:studio": "drizzle-kit studio",
 		"db:clean": "bun run scripts/db-clean.ts",
 		"test": "vitest run",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"docker:dev": "docker compose -f docker-compose.dev.yml up -d --build",
+		"docker:prod": "docker compose up -d --build",
+		"docker:down": "docker compose down",
+		"docker:logs": "docker compose logs -f"
 	},
 	"dependencies": {
 		"@astrojs/node": "^9.5.1",

@@ -9,6 +9,10 @@ services:
       - PUBLIC_SPOTIFY_CLIENT_ID=${PUBLIC_SPOTIFY_CLIENT_ID}
       - PUBLIC_SPOTIFY_REDIRECT_URI=${PUBLIC_SPOTIFY_REDIRECT_URI}
       - PORT=${PORT:-2500}
+      # Auth (optional - username is always "admin")
+      - AUTH_ENABLED=${AUTH_ENABLED:-false}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-}
+      - AUTH_SECRET=${AUTH_SECRET:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${PORT:-2500}/api/health"]
