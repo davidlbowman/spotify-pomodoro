@@ -241,6 +241,25 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 			yield* switchPhase({ autoStart: true });
 		});
 
+		const stop = Effect.gen(function* () {
+			yield* stopTicking;
+			const state = yield* SubscriptionRef.get(stateRef);
+
+			yield* SubscriptionRef.set(
+				stateRef,
+				new TimerState({
+					...state,
+					phase: "idle",
+					status: "stopped",
+					remainingSeconds: state.config.focusDuration,
+					overtime: 0,
+					currentPomodoroId: null,
+					currentSessionId: null,
+					elapsedSeconds: 0,
+				}),
+			);
+		});
+
 		const setConfig = (config: TimerConfig) =>
 			Effect.gen(function* () {
 				const state = yield* SubscriptionRef.get(stateRef);
@@ -286,6 +305,7 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 			switchPhase,
 			endSession,
 			skip,
+			stop,
 			setConfig,
 			setPreset,
 			setOnTimerEnd,

@@ -212,6 +212,33 @@ export function useTimer() {
 		await switchPhase({ autoStart: true });
 	}, [switchPhase]);
 
+	const stop = useCallback(async () => {
+		if (!state) return;
+
+		if (state.phase === "focus" && dbFocusSessionIdRef.current) {
+			await completeFocusSession(
+				dbFocusSessionIdRef.current,
+				state.totalElapsedSeconds,
+			).catch((e) => console.error("Failed to complete focus session:", e));
+			dbFocusSessionIdRef.current = null;
+		} else if (state.phase === "break" && dbBreakSessionIdRef.current) {
+			await completeBreakSession(
+				dbBreakSessionIdRef.current,
+				state.totalElapsedSeconds,
+			).catch((e) => console.error("Failed to complete break session:", e));
+			dbBreakSessionIdRef.current = null;
+		}
+
+		if (dbPomodoroIdRef.current) {
+			await completePomodoro(dbPomodoroIdRef.current).catch((e) =>
+				console.error("Failed to complete pomodoro:", e),
+			);
+			dbPomodoroIdRef.current = null;
+		}
+
+		await runEffect(Timer.stop);
+	}, [state]);
+
 	const setConfig = useCallback(
 		(focusMinutes: number, breakMinutes: number) =>
 			runEffect(
@@ -238,6 +265,7 @@ export function useTimer() {
 		switchPhase,
 		endSession,
 		skip,
+		stop,
 		setConfig,
 		setPreset,
 		presets: TIMER_PRESETS,
