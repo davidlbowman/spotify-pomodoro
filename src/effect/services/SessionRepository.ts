@@ -264,6 +264,7 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 					);
 					const weekStart = new Date(todayStart);
 					weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+					const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
 					const completedPomodoros = allPomodoros.filter((p) => p.completedAt);
 
@@ -273,6 +274,10 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 
 					const thisWeekPomodoros = completedPomodoros.filter(
 						(p) => p.completedAt && new Date(p.completedAt) >= weekStart,
+					).length;
+
+					const thisMonthPomodoros = completedPomodoros.filter(
+						(p) => p.completedAt && new Date(p.completedAt) >= monthStart,
 					).length;
 
 					const pomodoroDates = new Set(
@@ -318,6 +323,107 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						pomodoroDates.size > 0 ? 1 : 0,
 					);
 
+					const computePeriodStats = (
+						startDate: Date,
+						pomodoroList: typeof completedPomodoros,
+						focusList: typeof completedFocus,
+						breakList: typeof completedBreak,
+					) => {
+						const periodPomodoros = pomodoroList.filter(
+							(p) => p.completedAt && new Date(p.completedAt) >= startDate,
+						);
+						const periodPomodoroIds = new Set(periodPomodoros.map((p) => p.id));
+
+						const periodFocus = focusList.filter((s) =>
+							periodPomodoroIds.has(s.pomodoroId),
+						);
+						const periodBreak = breakList.filter((s) =>
+							periodPomodoroIds.has(s.pomodoroId),
+						);
+
+						return {
+							pomodoros: periodPomodoros.length,
+							focusSeconds: periodFocus.reduce(
+								(sum, s) => sum + s.elapsedSeconds,
+								0,
+							),
+							breakSeconds: periodBreak.reduce(
+								(sum, s) => sum + s.elapsedSeconds,
+								0,
+							),
+							focusOvertimeSeconds: periodFocus.reduce(
+								(sum, s) =>
+									sum + Math.max(0, s.elapsedSeconds - s.configuredSeconds),
+								0,
+							),
+							breakOvertimeSeconds: periodBreak.reduce(
+								(sum, s) =>
+									sum + Math.max(0, s.elapsedSeconds - s.configuredSeconds),
+								0,
+							),
+						};
+					};
+
+					const today = computePeriodStats(
+						todayStart,
+						completedPomodoros,
+						completedFocus,
+						completedBreak,
+					);
+					const week = computePeriodStats(
+						weekStart,
+						completedPomodoros,
+						completedFocus,
+						completedBreak,
+					);
+					const month = computePeriodStats(
+						monthStart,
+						completedPomodoros,
+						completedFocus,
+						completedBreak,
+					);
+
+					const dailyActivityMap = new Map<
+						string,
+						{ count: number; focusSeconds: number }
+					>();
+					const yearAgo = new Date(todayStart);
+					yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+
+					for (const p of completedPomodoros) {
+						if (!p.completedAt) continue;
+						const d = new Date(p.completedAt);
+						if (d < yearAgo) continue;
+						const dateStr = d.toISOString().split("T")[0];
+						const existing = dailyActivityMap.get(dateStr) || {
+							count: 0,
+							focusSeconds: 0,
+						};
+						existing.count++;
+						dailyActivityMap.set(dateStr, existing);
+					}
+
+					for (const s of completedFocus) {
+						if (!s.completedAt) continue;
+						const d = new Date(s.completedAt);
+						if (d < yearAgo) continue;
+						const dateStr = d.toISOString().split("T")[0];
+						const existing = dailyActivityMap.get(dateStr) || {
+							count: 0,
+							focusSeconds: 0,
+						};
+						existing.focusSeconds += s.elapsedSeconds;
+						dailyActivityMap.set(dateStr, existing);
+					}
+
+					const dailyActivity = Array.from(dailyActivityMap.entries())
+						.map(([date, data]) => ({
+							date,
+							count: data.count,
+							focusSeconds: data.focusSeconds,
+						}))
+						.sort((a, b) => a.date.localeCompare(b.date));
+
 					return {
 						totalPomodoros: allPomodoros.length,
 						completedPomodoros: completedPomodoros.length,
@@ -331,6 +437,11 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						longestStreak,
 						todayPomodoros,
 						thisWeekPomodoros,
+						thisMonthPomodoros,
+						today,
+						week,
+						month,
+						dailyActivity,
 					} as SessionStats;
 				},
 				catch: (error) =>

@@ -34,6 +34,32 @@ export interface SessionResponse {
 }
 
 /**
+ * Daily activity record for contribution graph.
+ *
+ * @since 0.3.0
+ * @category Types
+ */
+export interface DailyActivity {
+	date: string;
+	count: number;
+	focusSeconds: number;
+}
+
+/**
+ * Stats for a specific time period.
+ *
+ * @since 0.3.0
+ * @category Types
+ */
+export interface PeriodStats {
+	pomodoros: number;
+	focusSeconds: number;
+	breakSeconds: number;
+	focusOvertimeSeconds: number;
+	breakOvertimeSeconds: number;
+}
+
+/**
  * Stats response from API.
  *
  * @since 0.2.0
@@ -52,6 +78,11 @@ export interface StatsResponse {
 	longestStreak: number;
 	todayPomodoros: number;
 	thisWeekPomodoros: number;
+	thisMonthPomodoros: number;
+	today: PeriodStats;
+	week: PeriodStats;
+	month: PeriodStats;
+	dailyActivity: DailyActivity[];
 }
 
 /**
