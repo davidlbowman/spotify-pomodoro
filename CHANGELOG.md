@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - 2025-12-10
+## [1.1.0] - 2025-12-11
 
 ### Added
 
@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auth middleware protecting all routes when enabled
 - 13 unit tests for Auth service (62 total)
 - Docker convenience scripts (`bun run docker:dev`, `docker:down`, `docker:logs`)
+- Playback error toast when Spotify device is unavailable
+- robots.txt disallowing all crawlers
+
+### Fixed
+
+- Session recording now uses imperative API calls instead of reactive useEffect, eliminating duplicate entries in React StrictMode
+- Stats now count completed pomodoros (after break ends) instead of completed focus sessions
+- Environment variables now work in both dev (`import.meta.env`) and Docker production (`process.env`)
 
 ### Security
 
