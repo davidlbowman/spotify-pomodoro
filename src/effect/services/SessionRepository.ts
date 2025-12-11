@@ -382,6 +382,13 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						completedFocus,
 						completedBreak,
 					);
+					const yearStart = new Date(now.getFullYear(), 0, 1);
+					const year = computePeriodStats(
+						yearStart,
+						completedPomodoros,
+						completedFocus,
+						completedBreak,
+					);
 
 					const allPomodoroIds = new Set(completedPomodoros.map((p) => p.id));
 					const allPeriodFocus = completedFocus.filter((s) =>
@@ -416,13 +423,10 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						string,
 						{ count: number; focusSeconds: number }
 					>();
-					const yearAgo = new Date(todayStart);
-					yearAgo.setFullYear(yearAgo.getFullYear() - 1);
 
 					for (const p of completedPomodoros) {
 						if (!p.completedAt) continue;
 						const d = new Date(p.completedAt);
-						if (d < yearAgo) continue;
 						const dateStr = d.toISOString().split("T")[0];
 						const existing = dailyActivityMap.get(dateStr) || {
 							count: 0,
@@ -435,7 +439,6 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 					for (const s of completedFocus) {
 						if (!s.completedAt) continue;
 						const d = new Date(s.completedAt);
-						if (d < yearAgo) continue;
 						const dateStr = d.toISOString().split("T")[0];
 						const existing = dailyActivityMap.get(dateStr) || {
 							count: 0,
@@ -470,6 +473,7 @@ export class SessionRepository extends Effect.Service<SessionRepository>()(
 						today,
 						week,
 						month,
+						year,
 						all,
 						dailyActivity,
 					} as SessionStats;

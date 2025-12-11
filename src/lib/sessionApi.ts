@@ -82,6 +82,7 @@ export interface StatsResponse {
 	today: PeriodStats;
 	week: PeriodStats;
 	month: PeriodStats;
+	year: PeriodStats;
 	all: PeriodStats;
 	dailyActivity: DailyActivity[];
 }

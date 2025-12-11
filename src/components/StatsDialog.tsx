@@ -26,7 +26,7 @@ interface StatsDialogProps {
 	children: React.ReactNode;
 }
 
-type TimePeriod = "today" | "week" | "month" | "all";
+type TimePeriod = "today" | "week" | "month" | "year" | "all";
 
 /**
  * Dialog displaying pomodoro session statistics.
@@ -47,6 +47,8 @@ export function StatsDialog({ children }: StatsDialogProps) {
 				return stats.week;
 			case "month":
 				return stats.month;
+			case "year":
+				return stats.year;
 			case "all":
 				return stats.all;
 		}
@@ -127,6 +129,7 @@ function PeriodTabs({ period, onChange }: PeriodTabsProps) {
 		{ value: "today", label: "Today", shortLabel: "D" },
 		{ value: "week", label: "Week", shortLabel: "W" },
 		{ value: "month", label: "Month", shortLabel: "M" },
+		{ value: "year", label: "Year", shortLabel: "Y" },
 		{ value: "all", label: "All", shortLabel: "All" },
 	];
 
