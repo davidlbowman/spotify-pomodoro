@@ -82,29 +82,6 @@ describe("Timer Service", () => {
 		);
 	});
 
-	describe("pause", () => {
-		it.effect("sets status to paused", () =>
-			Effect.gen(function* () {
-				const timer = yield* Timer;
-				yield* timer.start;
-				yield* timer.pause;
-				const state = yield* SubscriptionRef.get(timer.state);
-				expect(state.status).toBe("paused");
-			}).pipe(Effect.provide(Timer.Default)),
-		);
-
-		it.effect("preserves remaining seconds", () =>
-			Effect.gen(function* () {
-				const timer = yield* Timer;
-				yield* timer.start;
-				const beforeState = yield* SubscriptionRef.get(timer.state);
-				yield* timer.pause;
-				const afterState = yield* SubscriptionRef.get(timer.state);
-				expect(afterState.remainingSeconds).toBe(beforeState.remainingSeconds);
-			}).pipe(Effect.provide(Timer.Default)),
-		);
-	});
-
 	describe("reset", () => {
 		it.effect("sets status to stopped", () =>
 			Effect.gen(function* () {

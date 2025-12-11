@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-12-11
+
+### Added
+
+- Stop button to end pomodoro without auto-transitioning (#19)
+
+### Changed
+
+- Keybinds updated: B=start break, F=start focus, E=end pomodoro
+- Removed timer pause functionality (simpler UX)
+
 ## [1.1.0] - 2025-12-11
 
 ### Added
@@ -13,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Login page with lofi aesthetic
 - Stateless signed cookie authentication (HMAC-SHA256)
 - Auth middleware protecting all routes when enabled
-- 13 unit tests for Auth service (62 total)
+- 13 unit tests for Auth service (60 total)
 - Docker convenience scripts (`bun run docker:dev`, `docker:down`, `docker:logs`)
 - Playback error toast when Spotify device is unavailable
 - robots.txt disallowing all crawlers
@@ -142,6 +153,7 @@ New optional environment variables:
 - Spotify Web API integration for playback control
 - JSDoc documentation throughout codebase
 
+[1.2.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/0.1.0...0.2.0
