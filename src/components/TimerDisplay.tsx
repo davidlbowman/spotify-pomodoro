@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
  * @category Components
  */
 export function TimerDisplay() {
-	const { state, start, reset, skip } = useTimer();
+	const { state, start, reset, skip, stop } = useTimer();
 
 	if (!state) {
 		return (
@@ -29,7 +29,7 @@ export function TimerDisplay() {
 	}
 
 	const isRunning = state.status === "running";
-	const isStopped = state.status === "stopped" || state.status === "paused";
+	const isStopped = state.status === "stopped";
 	const isOvertime = state.isOvertime;
 
 	return (
@@ -100,7 +100,7 @@ export function TimerDisplay() {
 				</div>
 
 				{state.phase !== "idle" && !isRunning && (
-					<div className="flex justify-center">
+					<div className="flex justify-center gap-3">
 						<Button
 							onClick={() => skip()}
 							variant="ghost"
@@ -108,6 +108,27 @@ export function TimerDisplay() {
 							className="text-muted-foreground"
 						>
 							Skip to {state.phase === "focus" ? "Break" : "Focus"}
+						</Button>
+						<Button
+							onClick={() => stop()}
+							variant="ghost"
+							size="sm"
+							className="text-muted-foreground hover:text-destructive"
+						>
+							Stop
+						</Button>
+					</div>
+				)}
+
+				{state.phase !== "idle" && isRunning && (
+					<div className="flex justify-center">
+						<Button
+							onClick={() => stop()}
+							variant="ghost"
+							size="sm"
+							className="text-muted-foreground hover:text-destructive"
+						>
+							Stop
 						</Button>
 					</div>
 				)}

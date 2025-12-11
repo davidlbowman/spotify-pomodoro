@@ -21,12 +21,12 @@ export const TimerPhase = Schema.Literal("focus", "break", "idle");
 export type TimerPhase = typeof TimerPhase.Type;
 
 /**
- * Timer status: running, paused, or stopped.
+ * Timer status: running or stopped.
  *
  * @since 0.0.1
  * @category Schemas
  */
-export const TimerStatus = Schema.Literal("running", "paused", "stopped");
+export const TimerStatus = Schema.Literal("running", "stopped");
 
 /**
  * @since 0.0.1

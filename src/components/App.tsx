@@ -4,7 +4,7 @@
  * @module
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Playlist } from "../effect/schema/Playlist";
 import {
 	useSpotifyAuth,
@@ -25,7 +25,7 @@ import { StatsDialog } from "./StatsDialog";
  */
 export function App() {
 	const { toggleTheme, isDark } = useTheme();
-	const { state, start, reset, skip } = useTimer();
+	const { state, start, reset, skip, stop } = useTimer();
 	const { isAuthenticated, login, logout } = useSpotifyAuth();
 	const { playlists, fetchPlaylists } = useSpotifyPlaylists();
 	const {
@@ -70,10 +70,6 @@ export function App() {
 		}
 	}, [playbackState]);
 
-	const endEarly = useCallback(() => {
-		skip();
-	}, [skip]);
-
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.target instanceof HTMLInputElement) return;
@@ -86,18 +82,21 @@ export function App() {
 			} else if (e.code === "KeyR" && !isRunning && phase !== "idle") {
 				e.preventDefault();
 				reset();
-			} else if (e.code === "KeyE" && isRunning && !isOvertime) {
-				e.preventDefault();
-				endEarly();
-			} else if (e.code === "KeyS" && isOvertime) {
+			} else if (e.code === "KeyB" && phase === "focus" && isRunning) {
 				e.preventDefault();
 				skip();
+			} else if (e.code === "KeyF" && phase === "break" && isRunning) {
+				e.preventDefault();
+				skip();
+			} else if (e.code === "KeyE" && phase !== "idle") {
+				e.preventDefault();
+				stop();
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [isRunning, isOvertime, start, reset, skip, endEarly, phase]);
+	}, [isRunning, phase, start, reset, skip, stop]);
 
 	const handlePlaylistSelect = async (playlist: Playlist) => {
 		setSelectedPlaylist(playlist);
@@ -227,12 +226,12 @@ export function App() {
 
 					<span className="text-muted-foreground/40 text-xs tracking-wide">
 						{isRunning
-							? isOvertime
-								? `press s to begin ${phase === "focus" ? "break" : "focus"}`
-								: `press e to end your ${phase} early`
+							? phase === "focus"
+								? "press b to start break · e to end pomodoro"
+								: "press f to start focus · e to end pomodoro"
 							: phase === "idle"
 								? "press space to start"
-								: "press space to resume · r to reset"}
+								: "press space to resume · r to reset · e to end"}
 					</span>
 
 					<div className="flex items-center gap-4 mt-4">
