@@ -163,6 +163,43 @@ const FullLayer = Layer.mergeAll(ServiceA.Default, ServiceB.Default).pipe(
 );
 ```
 
+### Logging
+
+Use Effect's built-in logging for observability. The logging configuration is centralized in `src/effect/logging.ts`.
+
+**Log levels** (use appropriately):
+- `Effect.logDebug` - Development diagnostics, request tracing
+- `Effect.logInfo` - Important state changes, service lifecycle
+- `Effect.logWarning` - Recoverable issues, deprecations
+- `Effect.logError` - Failures requiring attention
+
+**Adding context** with `Effect.annotateLogs`:
+
+```typescript
+yield* Effect.logDebug("Processing request").pipe(
+  Effect.annotateLogs("userId", userId),
+  Effect.annotateLogs("action", "create"),
+);
+```
+
+**Tracking duration** with `Effect.withLogSpan`:
+
+```typescript
+const createUser = Effect.gen(function* () {
+  yield* Effect.logInfo("Creating user");
+  const result = yield* db.insert(user);
+  return result;
+}).pipe(Effect.withLogSpan("createUser"));
+```
+
+**Environment configuration**:
+- `PUBLIC_LOG_LEVEL` - Set minimum log level (all, trace, debug, info, warning, error, fatal, none)
+- `PUBLIC_LOG_FORMAT` - Output format (pretty, json). Defaults to pretty in dev, json in production.
+
+**Layer usage**:
+- Client-side services use `MainLayer` (includes `LoggingLayer`)
+- API routes use `ServerLayer` (includes `SessionRepository` + `LoggingLayer`)
+
 ## Testing
 
 This project uses [Vitest](https://vitest.dev/) with [@effect/vitest](https://effect.website/docs/guides/testing) for testing Effect services.

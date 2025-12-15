@@ -5,6 +5,7 @@
  */
 import type { APIRoute } from "astro";
 import { Effect } from "effect";
+import { ServerLayer } from "@/effect/layers";
 import { SessionRepository } from "@/effect/services/SessionRepository";
 
 /**
@@ -23,9 +24,12 @@ export const POST: APIRoute = async ({ params }) => {
 	}
 
 	const program = Effect.gen(function* () {
+		yield* Effect.logDebug("POST /api/pomodoros/:id/complete").pipe(
+			Effect.annotateLogs("pomodoroId", id),
+		);
 		const repo = yield* SessionRepository;
 		return yield* repo.completePomodoro(id);
-	}).pipe(Effect.provide(SessionRepository.Default));
+	}).pipe(Effect.provide(ServerLayer));
 
 	const result = await Effect.runPromise(program).catch((error) => ({
 		error: String(error),

@@ -5,6 +5,7 @@
  */
 import type { APIRoute } from "astro";
 import { Effect } from "effect";
+import { ServerLayer } from "@/effect/layers";
 import { SessionRepository } from "@/effect/services/SessionRepository";
 
 /**
@@ -40,9 +41,12 @@ export const POST: APIRoute = async ({ request }) => {
 	}
 
 	const program = Effect.gen(function* () {
+		yield* Effect.logDebug("POST /api/focus-sessions").pipe(
+			Effect.annotateLogs("pomodoroId", pomodoroId),
+		);
 		const repo = yield* SessionRepository;
 		return yield* repo.createFocusSession({ pomodoroId, configuredSeconds });
-	}).pipe(Effect.provide(SessionRepository.Default));
+	}).pipe(Effect.provide(ServerLayer));
 
 	const result = await Effect.runPromise(program).catch((error) => ({
 		error: String(error),

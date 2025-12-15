@@ -18,9 +18,11 @@ export class AudioNotification extends Effect.Service<AudioNotification>()(
 	"AudioNotification",
 	{
 		effect: Effect.gen(function* () {
+			yield* Effect.logDebug("AudioNotification service initializing");
 			const audioContextRef = yield* Ref.make<Option.Option<AudioContext>>(
 				Option.none(),
 			);
+			yield* Effect.logDebug("AudioNotification service initialized");
 
 			const getOrCreateContext = Effect.gen(function* () {
 				const maybeCtx = yield* Ref.get(audioContextRef);
@@ -33,6 +35,7 @@ export class AudioNotification extends Effect.Service<AudioNotification>()(
 			});
 
 			const play = Effect.gen(function* () {
+				yield* Effect.logDebug("Playing audio notification");
 				const ctx = yield* getOrCreateContext;
 				yield* Effect.sync(() => {
 					if (ctx.state === "suspended") {

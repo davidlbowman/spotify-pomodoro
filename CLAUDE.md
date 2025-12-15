@@ -124,6 +124,10 @@ Optional for authentication (VPS deployments):
 - `AUTH_PASSWORD` - Login password (username is always "admin")
 - `AUTH_SECRET` - Secret for signing cookies (32+ chars recommended)
 
+Optional for logging:
+- `PUBLIC_LOG_LEVEL` - Log level: all, trace, debug, info, warning, error, fatal, none (default: info)
+- `PUBLIC_LOG_FORMAT` - Log format: pretty (colorful) or json (structured) (default: pretty in dev)
+
 ## OAuth Architecture
 
 Spotify OAuth uses server-side PKCE flow:

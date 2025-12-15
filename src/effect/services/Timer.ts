@@ -38,6 +38,8 @@ export const TIMER_PRESETS: Record<
  */
 export class Timer extends Effect.Service<Timer>()("Timer", {
 	effect: Effect.gen(function* () {
+		yield* Effect.logDebug("Timer service initializing");
+
 		const stateRef = yield* SubscriptionRef.make(
 			new TimerState({
 				phase: "idle",
@@ -55,6 +57,8 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 				elapsedSeconds: 0,
 			}),
 		);
+
+		yield* Effect.logDebug("Timer service initialized");
 
 		const intervalRef = yield* Ref.make<
 			Option.Option<ReturnType<typeof setInterval>>
@@ -87,6 +91,9 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 					);
 
 					if (currentState.overtime === 0) {
+						yield* Effect.logInfo("Timer completed, entering overtime").pipe(
+							Effect.annotateLogs("phase", currentState.phase),
+						);
 						const callback = yield* Ref.get(onTimerEndRef);
 						yield* Option.match(callback, {
 							onNone: () => Effect.void,
@@ -126,6 +133,9 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 
 			if (state.phase === "idle") {
 				const pomodoroId = crypto.randomUUID();
+				yield* Effect.logInfo("Starting new pomodoro").pipe(
+					Effect.annotateLogs("pomodoroId", pomodoroId),
+				);
 				yield* SubscriptionRef.set(
 					stateRef,
 					new TimerState({
@@ -140,6 +150,9 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 					}),
 				);
 			} else {
+				yield* Effect.logInfo("Resuming timer").pipe(
+					Effect.annotateLogs("phase", state.phase),
+				);
 				yield* SubscriptionRef.update(
 					stateRef,
 					(s) => new TimerState({ ...s, status: "running" }),
@@ -150,6 +163,7 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 		});
 
 		const reset = Effect.gen(function* () {
+			yield* Effect.logDebug("Resetting timer");
 			yield* stopTicking;
 			const state = yield* SubscriptionRef.get(stateRef);
 			const duration =
@@ -187,6 +201,14 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 
 				const shouldAutoStart = options?.autoStart ?? false;
 
+				yield* Effect.logInfo("Switching phase").pipe(
+					Effect.annotateLogs({
+						fromPhase: state.phase,
+						toPhase: newPhase,
+						autoStart: String(shouldAutoStart),
+					}),
+				);
+
 				yield* SubscriptionRef.set(
 					stateRef,
 					new TimerState({
@@ -212,6 +234,13 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 				yield* stopTicking;
 				const state = yield* SubscriptionRef.get(stateRef);
 
+				yield* Effect.logInfo("Ending session").pipe(
+					Effect.annotateLogs({
+						phase: state.phase,
+						switchToNext: String(options?.switchToNext ?? false),
+					}),
+				);
+
 				const newSessionCount =
 					state.phase === "focus" ? state.sessionCount + 1 : state.sessionCount;
 
@@ -234,6 +263,7 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 		});
 
 		const stop = Effect.gen(function* () {
+			yield* Effect.logInfo("Stopping timer and returning to idle");
 			yield* stopTicking;
 			const state = yield* SubscriptionRef.get(stateRef);
 
@@ -254,6 +284,12 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 
 		const setConfig = (config: TimerConfig) =>
 			Effect.gen(function* () {
+				yield* Effect.logDebug("Updating timer config").pipe(
+					Effect.annotateLogs({
+						focusDuration: String(config.focusDuration),
+						breakDuration: String(config.breakDuration),
+					}),
+				);
 				const state = yield* SubscriptionRef.get(stateRef);
 				const duration =
 					state.phase === "focus" || state.phase === "idle"
@@ -274,6 +310,9 @@ export class Timer extends Effect.Service<Timer>()("Timer", {
 
 		const setPreset = (preset: TimerPreset) =>
 			Effect.gen(function* () {
+				yield* Effect.logInfo("Setting timer preset").pipe(
+					Effect.annotateLogs("preset", preset),
+				);
 				const { focus, break: breakDuration } = TIMER_PRESETS[preset];
 				const config = new TimerConfig({
 					focusDuration: focus,

@@ -22,14 +22,17 @@ const SPOTIFY_CLIENT_ID = import.meta.env.PUBLIC_SPOTIFY_CLIENT_ID;
  */
 export class SpotifyAuth extends Effect.Service<SpotifyAuth>()("SpotifyAuth", {
 	effect: Effect.gen(function* () {
+		yield* Effect.logDebug("SpotifyAuth initializing");
 		const httpClient = (yield* HttpClient.HttpClient).pipe(
 			HttpClient.withTracerPropagation(false),
 		);
 		const tokenRef = yield* Ref.make<Option.Option<SpotifyToken>>(
 			Option.none(),
 		);
+		yield* Effect.logDebug("SpotifyAuth initialized");
 
 		const getToken = Effect.gen(function* () {
+			yield* Effect.logDebug("Getting Spotify token");
 			const maybeToken = yield* Ref.get(tokenRef);
 			return yield* Option.match(maybeToken, {
 				onNone: () =>
@@ -39,13 +42,18 @@ export class SpotifyAuth extends Effect.Service<SpotifyAuth>()("SpotifyAuth", {
 							message: "No token available",
 						}),
 					),
-				onSome: (token) =>
-					token.isExpired ? refreshToken : Effect.succeed(token),
+				onSome: (token) => {
+					if (token.isExpired) {
+						return refreshToken;
+					}
+					return Effect.succeed(token);
+				},
 			});
 		});
 
 		const refreshToken: Effect.Effect<SpotifyToken, SpotifyAuthError> =
 			Effect.gen(function* () {
+				yield* Effect.logInfo("Refreshing Spotify token");
 				const maybeToken = yield* Ref.get(tokenRef);
 				const currentToken = yield* Option.match(maybeToken, {
 					onNone: () =>
@@ -102,10 +110,12 @@ export class SpotifyAuth extends Effect.Service<SpotifyAuth>()("SpotifyAuth", {
 					localStorage.setItem("spotify_token", JSON.stringify(newToken));
 				});
 
+				yield* Effect.logInfo("Spotify token refreshed successfully");
 				return newToken;
-			});
+			}).pipe(Effect.withLogSpan("SpotifyAuth.refreshToken"));
 
 		const restoreToken = Effect.gen(function* () {
+			yield* Effect.logDebug("Restoring Spotify token from storage");
 			const stored = yield* Effect.sync(() =>
 				localStorage.getItem("spotify_token"),
 			);
@@ -113,12 +123,15 @@ export class SpotifyAuth extends Effect.Service<SpotifyAuth>()("SpotifyAuth", {
 				const parsed = JSON.parse(stored);
 				const token = new SpotifyToken(parsed);
 				yield* Ref.set(tokenRef, Option.some(token));
+				yield* Effect.logInfo("Spotify token restored from storage");
 				return Option.some(token);
 			}
+			yield* Effect.logDebug("No stored Spotify token found");
 			return Option.none();
 		});
 
 		const logout = Effect.gen(function* () {
+			yield* Effect.logInfo("Logging out of Spotify");
 			yield* Ref.set(tokenRef, Option.none());
 			yield* Effect.sync(() => localStorage.removeItem("spotify_token"));
 		});

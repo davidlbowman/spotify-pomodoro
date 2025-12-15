@@ -29,10 +29,12 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 	"SpotifyClient",
 	{
 		effect: Effect.gen(function* () {
+			yield* Effect.logDebug("SpotifyClient initializing");
 			const httpClient = (yield* HttpClient.HttpClient).pipe(
 				HttpClient.withTracerPropagation(false),
 			);
 			const auth = yield* SpotifyAuth;
+			yield* Effect.logDebug("SpotifyClient initialized");
 
 			const authorizedFetch = <A>(
 				makeRequest: (
@@ -54,6 +56,7 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 
 			const getPlaylists = authorizedFetch((accessToken) =>
 				Effect.gen(function* () {
+					yield* Effect.logDebug("Fetching playlists");
 					const request = HttpClientRequest.get(
 						`${SPOTIFY_API_BASE}/me/playlists`,
 					).pipe(
@@ -91,6 +94,10 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 						}>;
 					};
 
+					yield* Effect.logDebug("Playlists fetched").pipe(
+						Effect.annotateLogs("count", String(data.items.length)),
+					);
+
 					return data.items.map(
 						(item) =>
 							new Playlist({
@@ -114,10 +121,11 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 							}),
 					);
 				}),
-			);
+			).pipe(Effect.withLogSpan("SpotifyClient.getPlaylists"));
 
 			const getPlaybackState = authorizedFetch((accessToken) =>
 				Effect.gen(function* () {
+					yield* Effect.logDebug("Fetching playback state");
 					const request = HttpClientRequest.get(
 						`${SPOTIFY_API_BASE}/me/player`,
 					).pipe(
@@ -138,6 +146,7 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 					);
 
 					if (res.status === 204) {
+						yield* Effect.logDebug("No active playback device");
 						return null;
 					}
 
@@ -158,6 +167,10 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 						context?: { uri: string };
 					};
 
+					yield* Effect.logDebug("Playback state fetched").pipe(
+						Effect.annotateLogs("isPlaying", String(data.is_playing)),
+					);
+
 					return new PlaybackState({
 						isPlaying: data.is_playing,
 						progressMs: data.progress_ms,
@@ -165,7 +178,7 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 						contextUri: data.context?.uri ?? null,
 					});
 				}),
-			);
+			).pipe(Effect.withLogSpan("SpotifyClient.getPlaybackState"));
 
 			const play = (options?: {
 				contextUri?: string;
@@ -174,6 +187,12 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 			}) =>
 				authorizedFetch((accessToken) =>
 					Effect.gen(function* () {
+						yield* Effect.logInfo("Starting playback").pipe(
+							Effect.annotateLogs({
+								hasContext: String(!!options?.contextUri),
+								hasUris: String(!!options?.uris),
+							}),
+						);
 						const body = options?.contextUri
 							? { context_uri: options.contextUri }
 							: options?.uris
@@ -202,10 +221,11 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 							),
 						);
 					}),
-				);
+				).pipe(Effect.withLogSpan("SpotifyClient.play"));
 
 			const pause = authorizedFetch((accessToken) =>
 				Effect.gen(function* () {
+					yield* Effect.logInfo("Pausing playback");
 					const request = HttpClientRequest.put(
 						`${SPOTIFY_API_BASE}/me/player/pause`,
 					).pipe(
@@ -225,11 +245,14 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 						),
 					);
 				}),
-			);
+			).pipe(Effect.withLogSpan("SpotifyClient.pause"));
 
 			const setShuffle = (state: boolean) =>
 				authorizedFetch((accessToken) =>
 					Effect.gen(function* () {
+						yield* Effect.logDebug("Setting shuffle mode").pipe(
+							Effect.annotateLogs("shuffle", String(state)),
+						);
 						const request = HttpClientRequest.put(
 							`${SPOTIFY_API_BASE}/me/player/shuffle`,
 						).pipe(
@@ -250,11 +273,14 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 							),
 						);
 					}),
-				);
+				).pipe(Effect.withLogSpan("SpotifyClient.setShuffle"));
 
 			const setRepeat = (state: "off" | "context" | "track") =>
 				authorizedFetch((accessToken) =>
 					Effect.gen(function* () {
+						yield* Effect.logDebug("Setting repeat mode").pipe(
+							Effect.annotateLogs("repeat", state),
+						);
 						const request = HttpClientRequest.put(
 							`${SPOTIFY_API_BASE}/me/player/repeat`,
 						).pipe(
@@ -275,7 +301,7 @@ export class SpotifyClient extends Effect.Service<SpotifyClient>()(
 							),
 						);
 					}),
-				);
+				).pipe(Effect.withLogSpan("SpotifyClient.setRepeat"));
 
 			return {
 				getPlaylists,

@@ -6,7 +6,9 @@
 
 import { FetchHttpClient } from "@effect/platform";
 import { Layer } from "effect";
+import { LoggingLayer } from "./logging";
 import { AudioNotification } from "./services/AudioNotification";
+import { SessionRepository } from "./services/SessionRepository";
 import { SpotifyAuth } from "./services/SpotifyAuth";
 import { SpotifyClient } from "./services/SpotifyClient";
 import { Timer } from "./services/Timer";
@@ -31,6 +33,7 @@ export const MainLayer = Layer.mergeAll(
 	SpotifyClientLive,
 	Timer.Default,
 	AudioNotification.Default,
+	LoggingLayer,
 );
 
 /**
@@ -40,3 +43,24 @@ export const MainLayer = Layer.mergeAll(
  * @category Layers
  */
 export type MainContext = Layer.Layer.Success<typeof MainLayer>;
+
+/**
+ * Server-side layer for API routes.
+ *
+ * Includes SessionRepository and logging configuration.
+ *
+ * @since 1.4.0
+ * @category Layers
+ */
+export const ServerLayer = Layer.mergeAll(
+	SessionRepository.Default,
+	LoggingLayer,
+);
+
+/**
+ * Context type for the server layer.
+ *
+ * @since 1.4.0
+ * @category Layers
+ */
+export type ServerContext = Layer.Layer.Success<typeof ServerLayer>;
