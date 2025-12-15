@@ -5,6 +5,7 @@
  */
 import type { APIRoute } from "astro";
 import { Effect } from "effect";
+import { ServerLayer } from "@/effect/layers";
 import { SessionRepository } from "@/effect/services/SessionRepository";
 
 /**
@@ -47,9 +48,13 @@ export const POST: APIRoute = async ({ params, request }) => {
 	}
 
 	const program = Effect.gen(function* () {
+		yield* Effect.logDebug("POST /api/break-sessions/:id/complete").pipe(
+			Effect.annotateLogs("sessionId", id),
+			Effect.annotateLogs("elapsedSeconds", elapsedSeconds),
+		);
 		const repo = yield* SessionRepository;
 		return yield* repo.completeBreakSession(id, { elapsedSeconds });
-	}).pipe(Effect.provide(SessionRepository.Default));
+	}).pipe(Effect.provide(ServerLayer));
 
 	const result = await Effect.runPromise(program).catch((error) => ({
 		error: String(error),
