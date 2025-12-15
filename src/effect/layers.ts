@@ -6,6 +6,7 @@
 
 import { FetchHttpClient } from "@effect/platform";
 import { Layer } from "effect";
+import { LoggingLayer } from "./logging";
 import { AudioNotification } from "./services/AudioNotification";
 import { SpotifyAuth } from "./services/SpotifyAuth";
 import { SpotifyClient } from "./services/SpotifyClient";
@@ -31,6 +32,7 @@ export const MainLayer = Layer.mergeAll(
 	SpotifyClientLive,
 	Timer.Default,
 	AudioNotification.Default,
+	LoggingLayer,
 );
 
 /**

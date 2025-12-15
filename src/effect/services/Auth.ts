@@ -54,6 +54,8 @@ const AUTH_USERNAME = "admin";
  */
 export class Auth extends Effect.Service<Auth>()("Auth", {
 	effect: Effect.gen(function* () {
+		yield* Effect.logDebug("Auth service initializing");
+
 		/**
 		 * Check if auth is enabled via environment variable.
 		 */
@@ -61,6 +63,8 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 			() =>
 				(process.env.AUTH_ENABLED || import.meta.env.AUTH_ENABLED) === "true",
 		);
+
+		yield* Effect.logDebug("Auth service initialized");
 
 		/**
 		 * Get auth configuration from environment.
@@ -94,6 +98,9 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 		 */
 		const createCookie = (username: string) =>
 			Effect.gen(function* () {
+				yield* Effect.logDebug("Creating auth cookie").pipe(
+					Effect.annotateLogs("username", username),
+				);
 				const config = yield* getConfig;
 				const exp = Math.floor(Date.now() / 1000) + config.maxAge;
 
@@ -113,6 +120,7 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 		 */
 		const verifyCookie = (cookie: string) =>
 			Effect.gen(function* () {
+				yield* Effect.logDebug("Verifying auth cookie");
 				const config = yield* getConfig;
 				const parts = cookie.split(".");
 
@@ -179,6 +187,7 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 		 */
 		const validateCredentials = (username: string, password: string) =>
 			Effect.gen(function* () {
+				yield* Effect.logDebug("Validating credentials");
 				const config = yield* getConfig;
 
 				const userBuffer = Buffer.from(username);
@@ -194,9 +203,11 @@ export class Auth extends Effect.Service<Auth>()("Auth", {
 					timingSafeEqual(passBuffer, expectedPassBuffer);
 
 				if (!userMatch || !passMatch) {
+					yield* Effect.logWarning("Invalid credentials attempt");
 					return yield* Effect.fail(new InvalidCredentialsError({}));
 				}
 
+				yield* Effect.logInfo("Credentials validated successfully");
 				return true;
 			});
 
