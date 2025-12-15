@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-12-15
+
+### Added
+
+- Structured logging using Effect's built-in logging system (#17)
+- Configurable log level via `PUBLIC_LOG_LEVEL` environment variable
+- Configurable log format via `PUBLIC_LOG_FORMAT` (pretty/json)
+- Debug logging for all Effect services (Timer, SessionRepository, SpotifyClient, SpotifyAuth, Auth, AudioNotification)
+- Debug logging for all API routes with request context
+- `ServerLayer` for API routes combining SessionRepository with logging
+
+### Technical
+
+- Centralized logging configuration in `src/effect/logging.ts`
+- `Effect.annotateLogs` for structured log context
+- `Effect.withLogSpan` for operation duration tracking
+- Pretty logger in development, JSON logger in production (configurable)
+
 ## [1.3.0] - 2025-12-11
 
 ### Added
@@ -167,6 +185,7 @@ New optional environment variables:
 - Spotify Web API integration for playback control
 - JSDoc documentation throughout codebase
 
+[1.4.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/davidlbowman/spotify-pomodoro/compare/1.0.0...1.1.0
